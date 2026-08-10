@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import pages from '../data/pages.json';
+
+export function getStaticPaths() {
+  return pages.map((page) => ({ params: { slug: page.route || undefined }, props: page }));
+}
+
+const page = Astro.props;
+const ogImage = page.html?.match(/<img[^>]+src=["']([^"']+)/i)?.[1];
+const noindex = page.route?.startsWith('tag/');
+---
+{page.redirect ? (
+  <html lang="th"><head><meta charset="utf-8" /><meta name="robots" content="noindex,follow" /><link rel="canonical" href="https://pneumaticth.com/blog/" /><meta http-equiv="refresh" content="0; url=/blog/" /><title>กำลังไปยังหน้าบทความ</title></head><body><a href="/blog/">ไปยังหน้าบทความ</a></body></html>
+) : (
+  <BaseLayout title={page.title} description={page.description} canonical={page.canonical} isHome={!page.route} footerHtml={page.footerHtml} ogImage={ogImage} route={page.route || ''} noindex={noindex}>
+    <article class="legacy-content" set:html={page.html} />
+  </BaseLayout>
+)}

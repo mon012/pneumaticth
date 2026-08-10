@@ -1,0 +1,139 @@
+---
+import '../styles/global.css';
+const { title, description = '', canonical = '/', isHome = false, footerHtml = '', ogImage, route = '', noindex = false } = Astro.props;
+const lineHref = 'https://lin.ee/UCQRpej';
+const siteUrl = new URL('https://pneumaticth.com');
+const canonicalUrl = new URL(canonical, siteUrl).href;
+const socialImageUrl = new URL(ogImage || '/favicon.webp', siteUrl).href;
+const fallbackDescription = 'จำหน่ายอุปกรณ์นิวเมติก อุปกรณ์ไฮดรอลิค และไส้กรองอุตสาหกรรม พร้อมบริการจากทีมวิศวกรและจัดส่งทั่วประเทศ';
+const metaDescription = description || fallbackDescription;
+const articleRoutes = new Set(['aftercoolers-factory', 'air-compressor', 'gefran', 'hydraulic-cylinder-overhaul', 'plc-type', 'purchasing-department-tips']);
+const collectionRoutes = new Set(['blog', 'engineer', 'tag/air-compressor', 'tag/plc']);
+const pageType = isHome ? 'WebPage' : articleRoutes.has(route) ? 'Article' : collectionRoutes.has(route) ? 'CollectionPage' : route === 'about' ? 'AboutPage' : route === 'privacy' ? 'WebPage' : 'WebPage';
+const organizationId = `${siteUrl.href}#organization`;
+const websiteId = `${siteUrl.href}#website`;
+const pageId = `${canonicalUrl}#webpage`;
+const graph = [
+  {
+    '@type': ['Organization', 'LocalBusiness'],
+    '@id': organizationId,
+    name: 'บริษัท นิวเมติก ดอทคอม (ประเทศไทย) จำกัด',
+    alternateName: 'Pneumatic Dotcom (Thailand)',
+    url: siteUrl.href,
+    logo: new URL('/favicon.webp', siteUrl).href,
+    image: socialImageUrl,
+    email: 'sale.pneumatic@gmail.com',
+    telephone: ['+66-2-591-6468', '+66-89-496-6746'],
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: 'ชั้น 5 อาคาร La Unique เลขที่ 40 เทศบาลรังสรรค์เหนือ',
+      addressLocality: 'แขวงลาดยาว เขตจตุจักร',
+      addressRegion: 'กรุงเทพมหานคร',
+      postalCode: '10900',
+      addressCountry: 'TH',
+    },
+    sameAs: ['https://www.facebook.com/pneumaticth', 'https://share.google/rErhoQDN25KWoXiyz'],
+  },
+  {
+    '@type': 'WebSite',
+    '@id': websiteId,
+    url: siteUrl.href,
+    name: 'Pneumatic Dotcom Thailand',
+    inLanguage: 'th-TH',
+    publisher: { '@id': organizationId },
+  },
+  {
+    '@type': pageType,
+    '@id': pageId,
+    url: canonicalUrl,
+    name: title,
+    headline: title,
+    description: metaDescription,
+    inLanguage: 'th-TH',
+    isPartOf: { '@id': websiteId },
+    about: { '@id': organizationId },
+    primaryImageOfPage: { '@type': 'ImageObject', url: socialImageUrl },
+    ...(articleRoutes.has(route) ? { author: { '@id': organizationId }, publisher: { '@id': organizationId } } : {}),
+  },
+  ...(!isHome ? [{
+    '@type': 'BreadcrumbList',
+    '@id': `${canonicalUrl}#breadcrumb`,
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'หน้าแรก', item: siteUrl.href },
+      { '@type': 'ListItem', position: 2, name: title.split(' » ')[0], item: canonicalUrl },
+    ],
+  }] : []),
+];
+const structuredData = { '@context': 'https://schema.org', '@graph': graph };
+---
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={metaDescription} />
+    {noindex && <meta name="robots" content="noindex,follow" />}
+    <link rel="icon" type="image/webp" href="/favicon.webp?v=2" />
+    <link rel="apple-touch-icon" href="/favicon.webp?v=2" />
+    <link rel="canonical" href={canonicalUrl} />
+    <meta property="og:locale" content="th_TH" />
+    <meta property="og:type" content={articleRoutes.has(route) ? 'article' : 'website'} />
+    <meta property="og:site_name" content="Pneumatic Dotcom Thailand" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={metaDescription} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={socialImageUrl} />
+    <meta property="og:image:alt" content={title} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={metaDescription} />
+    <meta name="twitter:image" content={socialImageUrl} />
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+    <title>{title}</title>
+  </head>
+  <body class:list={{ home: isHome }}>
+    <!--
+      REFINEMENT CONTRACT
+      Intent: preserve the familiar PneumaticTH identity while improving clarity and trust.
+      Hierarchy: company and services first, LINE remains the primary action.
+      Interaction: restrained, accessible, and useful; no decorative motion.
+      Responsive: long Thai content stays readable and navigation stays reachable.
+      Preservation: original copy, href values, outbound links, and embeds remain unchanged.
+    -->
+    <a class="skip-link" href="#content">ข้ามไปยังเนื้อหา</a>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="PneumaticTH หน้าแรก">
+        <img src="/favicon.webp?v=2" alt="บริษัท นิวเมติก ดอทคอม (ประเทศไทย) จำกัด" width="58" height="58" decoding="async" fetchpriority="high" data-image-component />
+        <span>นิวเมติก ดอทคอม<br /><small>(ประเทศไทย)</small></span>
+      </a>
+      <button class="menu-toggle" aria-expanded="false" aria-controls="primary-nav">เมนู</button>
+      <nav id="primary-nav" aria-label="เมนูหลัก">
+        <a href="/pneumatic/">นิวเมติก</a>
+        <a href="/hydraulic/">ไฮดรอลิค</a>
+        <a href="/filter/">ไส้กรอง</a>
+      </nav>
+      <a class="line-cta" href={lineHref} target="_blank" rel="noopener noreferrer">
+        <span>คุยกับเราทาง</span>
+        <svg aria-hidden="true" viewBox="0 0 48 48" width="24" height="24"><path fill="currentColor" d="M25.12 44.52c-2.11 1.16-2.02-.55-1.93-1.08l.3-1.78c.07-.54.14-1.36-.07-1.89-.23-.58-1.16-.88-1.85-1.03C11.48 37.42 4.01 30.4 4.01 22.03 4.01 12.68 13.43 5.08 25 5.08S46 12.68 46 22.03c0 10.49-11.13 17.13-20.88 22.49ZM18.37 25.85c0-.56-.46-1.02-1.02-1.02h-2.86v-6.68c0-.56-.46-1.01-1.02-1.01-.57 0-1.03.45-1.03 1.01v7.7c0 .56.46 1.01 1.03 1.01h3.88c.56 0 1.02-.45 1.02-1.01Zm2.99-7.7c0-.56-.46-1.01-1.03-1.01-.56 0-1.02.45-1.02 1.01v7.7c0 .56.46 1.01 1.02 1.01.57 0 1.03-.45 1.03-1.01v-7.7Zm9.34 0c0-.56-.46-1.01-1.03-1.01-.56 0-1.02.45-1.02 1.01v4.76l-3.98-5.37a1.03 1.03 0 0 0-1.14-.35c-.42.14-.7.53-.7.96v7.7c0 .56.46 1.01 1.02 1.01.57 0 1.03-.45 1.03-1.01v-4.76l3.98 5.37c.19.25.5.4.82.4.1 0 .21-.01.32-.05.42-.14.7-.52.7-.96v-7.7Zm6.28 2.83h-2.86v-1.81h2.86c.56 0 1.02-.46 1.02-1.02s-.46-1.01-1.02-1.01H33.1c-.57 0-1.03.45-1.03 1.01v7.7c0 .56.46 1.01 1.03 1.01h3.88c.56 0 1.02-.45 1.02-1.01s-.46-1.02-1.02-1.02h-2.86v-1.81h2.86c.56 0 1.02-.46 1.02-1.02s-.46-1.02-1.02-1.02Z"/></svg>
+      </a>
+    </header>
+    <main id="content"><slot /></main>
+    <footer class="site-footer" set:html={footerHtml} />
+    <script>
+      const button = document.querySelector('.menu-toggle');
+      const nav = document.querySelector('#primary-nav');
+      button?.addEventListener('click', () => {
+        const open = button.getAttribute('aria-expanded') === 'true';
+        button.setAttribute('aria-expanded', String(!open));
+        nav?.classList.toggle('open', !open);
+      });
+      const marquee = document.querySelector('.logo-marquee');
+      if (marquee) {
+        const updateMotion = (visible = true) => marquee.classList.toggle('is-paused', !visible || document.hidden);
+        const observer = new IntersectionObserver(([entry]) => updateMotion(entry.isIntersecting), { threshold: 0.01 });
+        observer.observe(marquee);
+        document.addEventListener('visibilitychange', () => updateMotion(marquee.getBoundingClientRect().bottom > 0 && marquee.getBoundingClientRect().top < innerHeight));
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,6 @@
+RewriteEngine On
+RewriteRule ^category/uncategorized/?$ /blog/ [R=301,L]
+RewriteRule ^uncategorized/?$ /blog/ [R=301,L]
+RewriteRule ^บทความ/?$ /blog/ [R=301,L,NE]
+
+ErrorDocument 404 /404.html

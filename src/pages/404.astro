@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import pages from '../data/pages.json';
+
+const footerHtml = pages.find((page) => !page.redirect)?.footerHtml || '';
+---
+<BaseLayout
+  title="ไม่พบหน้าที่ต้องการ | Pneumatic Dotcom Thailand"
+  description="ไม่พบหน้าที่คุณต้องการ เลือกดูอุปกรณ์นิวเมติก ไฮดรอลิค ไส้กรองอุตสาหกรรม หรือกลับไปหน้าแรก"
+  canonical="/404/"
+  route="404"
+  noindex={true}
+  footerHtml={footerHtml}
+>
+  <article class="not-found-page">
+    <p class="not-found-code">404</p>
+    <h1>ไม่พบหน้าที่คุณต้องการ</h1>
+    <p>ลิงก์อาจถูกย้ายหรือไม่มีอยู่แล้ว คุณสามารถกลับหน้าแรกหรือเลือกดูหมวดสินค้าหลักได้</p>
+    <nav aria-label="ลิงก์แนะนำ">
+      <a href="/">กลับหน้าแรก</a>
+      <a href="/pneumatic/">อุปกรณ์นิวเมติก</a>
+      <a href="/hydraulic/">อุปกรณ์ไฮดรอลิค</a>
+      <a href="/filter/">ไส้กรองอุตสาหกรรม</a>
+    </nav>
+  </article>
+</BaseLayout>
+
+<style>
+  .not-found-page{max-width:800px;margin:0 auto;padding:clamp(72px,10vw,140px) 24px;text-align:center}
+  .not-found-code{margin:0;color:#286ffb;font-size:clamp(64px,12vw,128px);font-weight:700;line-height:.9}
+  .not-found-page h1{margin:24px 0 12px;font-size:clamp(32px,5vw,52px)}
+  .not-found-page>p:not(.not-found-code){max-width:620px;margin:0 auto;color:#536174}
+  .not-found-page nav{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:32px}
+  .not-found-page nav a{padding:11px 18px;border-radius:10px;background:#286ffb;color:#fff;text-decoration:none}
+  .not-found-page nav a:hover,.not-found-page nav a:focus-visible{text-decoration:underline}
+</style>
