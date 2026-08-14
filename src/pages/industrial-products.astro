@@ -1,0 +1,66 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import pages from '../data/pages.json';
+
+const template = pages.find((page) => page.route === 'pneumatic');
+const footerHtml = template?.footerHtml ?? '';
+const title = 'สินค้าอุตสาหกรรมอื่นๆ | Pneumatic Dotcom';
+const description = 'จำหน่ายอุปกรณ์ไฟฟ้า Pressure Switch น้ำมันเครื่อง ดอกเจาะ และสินค้าอุตสาหกรรมอื่นๆ พร้อมบริการให้คำปรึกษาและจัดส่งทั่วประเทศ';
+
+const categoryOverview = `
+  <section class="industrial-category-overview" aria-labelledby="industrial-category-title">
+    <p class="industrial-category-overview__eyebrow">กลุ่มสินค้าที่เราจัดจำหน่าย</p>
+    <h2 id="industrial-category-title">ครอบคลุมอุปกรณ์และวัสดุสำหรับงานโรงงาน</h2>
+    <ul>
+      <li>อุปกรณ์ไฟฟ้า</li>
+      <li>Pressure Switch</li>
+      <li>น้ำมันเครื่องและสารหล่อลื่น</li>
+      <li>ดอกเจาะและเครื่องมือตัด</li>
+    </ul>
+  </section>`;
+
+const productAccordion = `
+  <section class="product-brand-accordion industrial-product-accordion" aria-label="ประเภทสินค้าอุตสาหกรรมอื่นๆ">
+    <details><summary>GEFRAN</summary><div class="product-brand-accordion__body"><p>อุปกรณ์ไฟฟ้า เซนเซอร์ และส่วนประกอบสำหรับควบคุมกระบวนการอุตสาหกรรม</p><ul class="product-brand-accordion__links">
+      <li><a href="https://automationplus.it/docs/Gefran/GEFRAN%20-%20General%20Overview/81101G_OVERVIEW_03-2020_ENG%20%281%29.pdf" target="_blank" rel="noopener noreferrer">Product Overview / Catalog (PDF)</a></li>
+      <li><a href="https://distribution.info.pl/producenci/G/GEFRAN/GEFRAN_CatDISTRIBUTORI_ENG.pdf#page=85" target="_blank" rel="noopener noreferrer">Sensors — ภาพรวมผลิตภัณฑ์ (PDF)</a></li>
+      <li><a href="https://pdf.directindustry.com/pdf/gefran/controllers-programmers/7132-620703.html" target="_blank" rel="noopener noreferrer">Controllers — แคตตาล็อกผลิตภัณฑ์ (PDF)</a></li>
+      <li><a href="https://pdf.directindustry.com/pdf/gefran/650-1250-1350-series-pid-temperature-controllers/7132-620726.html" target="_blank" rel="noopener noreferrer">Temperature Controllers รุ่น 650 / 1250 / 1350 (PDF)</a></li>
+      <li><a href="https://pim-kft.hu/download/4149/Gefran_pressure_transducers_en.pdf" target="_blank" rel="noopener noreferrer">Pressure Transducers and Transmitters (PDF)</a></li>
+    </ul></div></details>
+    <details><summary>Danfoss</summary><div class="product-brand-accordion__body"><ul class="product-brand-accordion__links">
+      <li><a href="https://assets.danfoss.com/documents/latest/192421/AD152486421850en-000501.pdf" target="_blank" rel="noopener noreferrer">Product Overview / Catalog — Switches (PDF)</a></li>
+      <li><a href="https://assets.danfoss.com/documents/latest/465164/AI000086439001en-001101.pdf" target="_blank" rel="noopener noreferrer">Pressure Switch KP35 — Data Sheet (PDF)</a></li>
+      <li><a href="https://assets.danfoss.com/documents/latest/570112/AN107086435208en-000401.pdf" target="_blank" rel="noopener noreferrer">Pressure Switch KP1 — Installation Guide (PDF)</a></li>
+      <li><a href="https://assets.danfoss.com/documents/latest/458219/AD445757800895en-000202.pdf" target="_blank" rel="noopener noreferrer">Inverter / VLT® Drives — Product Overview (PDF)</a></li>
+      <li><a href="https://assets.danfoss.com/documents/latest/198824/AD145186424537en-US0902.pdf" target="_blank" rel="noopener noreferrer">Solenoid Valves — Product Overview (PDF)</a></li>
+    </ul></div></details>
+    <details><summary>น้ำมันเครื่องและสารหล่อลื่น</summary><div class="product-brand-accordion__body"><p>ผลิตภัณฑ์หล่อลื่นสำหรับเครื่องจักร ช่วยลดการสึกหรอและดูแลประสิทธิภาพการทำงาน</p></div></details>
+    <details><summary>ดอกเจาะและเครื่องมือตัด</summary><div class="product-brand-accordion__body"><p>ดอกเจาะและเครื่องมือตัดสำหรับงานผลิต งานซ่อมบำรุง และงานวิศวกรรม</p></div></details>
+  </section>`;
+
+const html = (template?.html ?? '')
+  .replace(
+    /<img width="1920" height="1280" src="[^"]+" class="attachment-full size-full wp-post-image" alt="[^"]+" decoding="sync" sizes="[^"]+" data-image-component="" loading="eager" fetchpriority="high">/,
+    '<img width="1200" height="801" src="/images/products/homa-appliances-ERXFD4jLpJc-unsplash.webp" class="attachment-full size-full wp-post-image" alt="สายการผลิตและเครื่องจักรอัตโนมัติภายในโรงงานอุตสาหกรรม" decoding="sync" sizes="(max-width: 1200px) 100vw, 1200px" data-image-component="" loading="eager" fetchpriority="high">',
+  )
+  .replace('<h1>อุปกรณ์นิวเมติก</h1>', '<h1>สินค้าอุตสาหกรรมอื่นๆ</h1>')
+  .replace(/<figure class="gb-block-image gb-block-image-64b7bd29 product-brands">[\s\S]*?<\/figure>/, categoryOverview)
+  .replace(
+    /<p class="wp-block-paragraph product-lead">[\s\S]*?<\/p>/,
+    '<p class="wp-block-paragraph product-lead">จำหน่ายสินค้าและอุปกรณ์สำหรับงานอุตสาหกรรมหลากหลายประเภท พร้อมบริการหลังการขายและคำแนะนำจากทีมงานที่มีประสบการณ์ ช่วยคัดเลือกสินค้าให้เหมาะกับเครื่องจักรและลักษณะการใช้งาน<br><br><span class="product-lead__contact">สอบถามข้อมูลเพิ่มเติม, เปรียบเทียบรุ่น หรือขอรับใบเสนอพร้อมเช็คสต๊อกสินค้า :: ฝ่ายขาย ::</span></p>',
+  )
+  .replace(/<section class="product-brand-accordion"[\s\S]*?<\/section>/, productAccordion)
+  .replaceAll('ตัวอย่างอุปกรณ์นิวเมติกที่จัดส่งจริง', 'ตัวอย่างสินค้าอุตสาหกรรมที่จัดส่งจริง');
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical="https://pneumaticth.com/industrial-products/"
+  footerHtml={footerHtml}
+  ogImage="/images/products/homa-appliances-ERXFD4jLpJc-unsplash.webp"
+  route="industrial-products"
+>
+  <article class="legacy-content" set:html={html} />
+</BaseLayout>
