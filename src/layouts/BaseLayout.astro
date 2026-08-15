@@ -1,14 +1,14 @@
 ---
 import '../styles/global.css';
-const { title, description = '', canonical = '/', isHome = false, footerHtml = '', ogImage, route = '', noindex = false } = Astro.props;
+const { title, description = '', canonical = '/', isHome = false, footerHtml = '', ogImage, route = '', noindex = false, hasVideo = false, heroSrcset, heroSizes } = Astro.props;
 const lineHref = 'https://lin.ee/UCQRpej';
 const siteUrl = new URL('https://pneumaticth.com');
 const canonicalUrl = new URL(canonical, siteUrl).href;
 const socialImageUrl = new URL(ogImage || '/favicon.webp', siteUrl).href;
 const fallbackDescription = 'จำหน่ายอุปกรณ์นิวเมติก อุปกรณ์ไฮดรอลิค และไส้กรองอุตสาหกรรม พร้อมบริการจากทีมวิศวกรและจัดส่งทั่วประเทศ';
 const metaDescription = description || fallbackDescription;
-const articleRoutes = new Set(['aftercoolers-factory', 'air-compressor', 'gefran', 'hydraulic-cylinder-overhaul', 'plc-type', 'purchasing-department-tips']);
-const collectionRoutes = new Set(['blog', 'engineer', 'tag/air-compressor', 'tag/plc']);
+const articleRoutes = new Set(['aftercoolers-factory', 'air-compressor', 'hydraulic-cylinder-overhaul', 'plc-type', 'purchasing-department-tips']);
+const collectionRoutes = new Set(['blog']);
 const pageType = isHome ? 'WebPage' : articleRoutes.has(route) ? 'Article' : collectionRoutes.has(route) ? 'CollectionPage' : route === 'about' ? 'AboutPage' : route === 'privacy' ? 'WebPage' : 'WebPage';
 const organizationId = `${siteUrl.href}#organization`;
 const websiteId = `${siteUrl.href}#website`;
@@ -77,7 +77,11 @@ const structuredData = { '@context': 'https://schema.org', '@graph': graph };
     })(window,document,'script','dataLayer','GTM-MTKXPDHV');</script>
     <!-- End Google Tag Manager -->
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://www.googletagmanager.com" />
+    <link rel="preload" href="/fonts/maledpan-regular-webfont.woff2" as="font" type="font/woff2" crossorigin />
+    {ogImage?.startsWith('/') && <link rel="preload" href={ogImage} as="image" fetchpriority="high" imagesrcset={heroSrcset} imagesizes={heroSizes} />}
+    {hasVideo && <link rel="preconnect" href="https://i.ytimg.com" />}
     <meta name="description" content={metaDescription} />
     {noindex && <meta name="robots" content="noindex,follow" />}
     <link rel="icon" type="image/webp" href="/favicon.webp?v=2" />
@@ -117,7 +121,7 @@ const structuredData = { '@context': 'https://schema.org', '@graph': graph };
         <img src="/favicon.webp?v=2" alt="บริษัท นิวเมติก ดอทคอม (ประเทศไทย) จำกัด" width="58" height="58" decoding="async" fetchpriority="high" data-image-component />
         <span>นิวเมติก ดอทคอม<br /><small>(ประเทศไทย)</small></span>
       </a>
-      <button class="menu-toggle" aria-expanded="false" aria-controls="primary-nav">เมนู</button>
+      <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="primary-nav">เมนู</button>
       <nav id="primary-nav" aria-label="เมนูหลัก">
         <a href="/pneumatic/">นิวเมติก</a>
         <a href="/hydraulic/">ไฮดรอลิค</a>
@@ -134,17 +138,42 @@ const structuredData = { '@context': 'https://schema.org', '@graph': graph };
     <script>
       const button = document.querySelector('.menu-toggle');
       const nav = document.querySelector('#primary-nav');
-      button?.addEventListener('click', () => {
-        const open = button.getAttribute('aria-expanded') === 'true';
-        button.setAttribute('aria-expanded', String(!open));
-        nav?.classList.toggle('open', !open);
+      const setMenu = (open) => {
+        button?.setAttribute('aria-expanded', String(open));
+        nav?.classList.toggle('open', open);
+      };
+      button?.addEventListener('click', () => setMenu(button.getAttribute('aria-expanded') !== 'true'));
+      // close on link click, on Escape, and when returning to the desktop layout
+      nav?.addEventListener('click', (event) => { if (event.target.closest('a')) setMenu(false); });
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && button?.getAttribute('aria-expanded') === 'true') { setMenu(false); button.focus(); }
       });
+      matchMedia('(min-width: 861px)').addEventListener('change', (event) => { if (event.matches) setMenu(false); });
+
+      // Pause the customer marquee when it is off-screen or the tab is hidden.
       const marquee = document.querySelector('.logo-marquee');
       if (marquee) {
-        const updateMotion = (visible = true) => marquee.classList.toggle('is-paused', !visible || document.hidden);
-        const observer = new IntersectionObserver(([entry]) => updateMotion(entry.isIntersecting), { threshold: 0.01 });
+        let visible = true;
+        const update = () => marquee.classList.toggle('is-paused', !visible || document.hidden);
+        const observer = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; update(); }, { threshold: 0.01 });
         observer.observe(marquee);
-        document.addEventListener('visibilitychange', () => updateMotion(marquee.getBoundingClientRect().bottom > 0 && marquee.getBoundingClientRect().top < innerHeight));
+        document.addEventListener('visibilitychange', update);
+        addEventListener('pagehide', () => observer.disconnect(), { once: true });
+      }
+
+      // YouTube facade: load the real embed only when the visitor asks for it.
+      for (const facade of document.querySelectorAll('.yt-facade')) {
+        facade.addEventListener('click', () => {
+          const iframe = document.createElement('iframe');
+          iframe.src = `https://www.youtube.com/embed/${facade.dataset.ytId}?autoplay=1&rel=0`;
+          iframe.title = facade.dataset.ytTitle || 'YouTube video';
+          iframe.width = 750;
+          iframe.height = 422;
+          iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+          iframe.allowFullscreen = true;
+          iframe.frameBorder = '0';
+          facade.replaceWith(iframe);
+        }, { once: true });
       }
     </script>
   </body>

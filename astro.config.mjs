@@ -3,15 +3,12 @@ import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
   site: 'https://pneumaticth.com',
+  // /uncategorized/, /category/uncategorized/ and /บทความ/ are 301'd by
+  // public/_redirects (Cloudflare Pages), so they are no longer built as pages.
+  // /engineer/, /uncategorized/, /category/uncategorized/, /บทความ/, /gefran/ and
+  // the /tag/ archives are 301'd by public/_redirects, so they are not built.
   integrations: [sitemap({
-    filter: (page) => ![
-      'https://pneumaticth.com/category/uncategorized/',
-      'https://pneumaticth.com/uncategorized/',
-      'https://pneumaticth.com/%E0%B8%9A%E0%B8%97%E0%B8%84%E0%B8%A7%E0%B8%B2%E0%B8%A1/',
-      'https://pneumaticth.com/tag/air-compressor/',
-      'https://pneumaticth.com/tag/plc/',
-      'https://pneumaticth.com/404/',
-    ].includes(page),
+    filter: (page) => page !== 'https://pneumaticth.com/404/',
   })],
   build: { format: 'directory' },
 });

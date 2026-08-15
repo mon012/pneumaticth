@@ -1,9 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import pages from '../data/pages.json';
+import footerHtml from '../data/footer.html?raw';
+import { mustReplace, mustReplaceAll } from '../lib/content.js';
 
 const template = pages.find((page) => page.route === 'pneumatic');
-const footerHtml = template?.footerHtml ?? '';
+if (!template) throw new Error('[industrial-products] pneumatic page missing from pages.json');
 const title = 'สินค้าอุตสาหกรรมอื่นๆ | Pneumatic Dotcom';
 const description = 'จำหน่ายอุปกรณ์ไฟฟ้า Pressure Switch น้ำมันเครื่อง ดอกเจาะ และสินค้าอุตสาหกรรมอื่นๆ พร้อมบริการให้คำปรึกษาและจัดส่งทั่วประเทศ';
 
@@ -39,19 +41,26 @@ const productAccordion = `
     <details><summary>ดอกเจาะและเครื่องมือตัด</summary><div class="product-brand-accordion__body"><p>ดอกเจาะและเครื่องมือตัดสำหรับงานผลิต งานซ่อมบำรุง และงานวิศวกรรม</p></div></details>
   </section>`;
 
-const html = (template?.html ?? '')
-  .replace(
-    /<img width="1920" height="1280" src="[^"]+" class="attachment-full size-full wp-post-image" alt="[^"]+" decoding="sync" sizes="[^"]+" data-image-component="" loading="eager" fetchpriority="high">/,
-    '<img width="1200" height="801" src="/images/products/homa-appliances-ERXFD4jLpJc-unsplash.webp" class="attachment-full size-full wp-post-image" alt="สายการผลิตและเครื่องจักรอัตโนมัติภายในโรงงานอุตสาหกรรม" decoding="sync" sizes="(max-width: 1200px) 100vw, 1200px" data-image-component="" loading="eager" fetchpriority="high">',
-  )
-  .replace('<h1>อุปกรณ์นิวเมติก</h1>', '<h1>สินค้าอุตสาหกรรมอื่นๆ</h1>')
-  .replace(/<figure class="gb-block-image gb-block-image-64b7bd29 product-brands">[\s\S]*?<\/figure>/, categoryOverview)
-  .replace(
-    /<p class="wp-block-paragraph product-lead">[\s\S]*?<\/p>/,
-    '<p class="wp-block-paragraph product-lead">จำหน่ายสินค้าและอุปกรณ์สำหรับงานอุตสาหกรรมหลากหลายประเภท พร้อมบริการหลังการขายและคำแนะนำจากทีมงานที่มีประสบการณ์ ช่วยคัดเลือกสินค้าให้เหมาะกับเครื่องจักรและลักษณะการใช้งาน<br><br><span class="product-lead__contact">สอบถามข้อมูลเพิ่มเติม, เปรียบเทียบรุ่น หรือขอรับใบเสนอพร้อมเช็คสต๊อกสินค้า :: ฝ่ายขาย ::</span></p>',
-  )
-  .replace(/<section class="product-brand-accordion"[\s\S]*?<\/section>/, productAccordion)
-  .replaceAll('ตัวอย่างอุปกรณ์นิวเมติกที่จัดส่งจริง', 'ตัวอย่างสินค้าอุตสาหกรรมที่จัดส่งจริง');
+// Every step below rewrites an exact fragment of the pneumatic page. mustReplace
+// throws at build time if a fragment stops matching, so a content change in
+// pages.json can never ship a silently-broken page.
+let html = template.html;
+html = mustReplace(
+  html,
+  /<img width="1920" height="1280" src="[^"]+" class="attachment-full size-full wp-post-image" alt="[^"]+" decoding="sync" sizes="[^"]+" data-image-component="" loading="eager" fetchpriority="high">/,
+  '<img width="1200" height="801" src="/images/products/homa-appliances-ERXFD4jLpJc-unsplash.webp" srcset="/images/products/homa-appliances-ERXFD4jLpJc-unsplash-768w.webp 768w, /images/products/homa-appliances-ERXFD4jLpJc-unsplash.webp 1200w" class="attachment-full size-full wp-post-image" alt="สายการผลิตและเครื่องจักรอัตโนมัติภายในโรงงานอุตสาหกรรม" decoding="sync" sizes="(max-width: 1200px) 100vw, 1200px" data-image-component="" loading="eager" fetchpriority="high">',
+  'hero image',
+);
+html = mustReplace(html, '<h1>อุปกรณ์นิวเมติก</h1>', '<h1>สินค้าอุตสาหกรรมอื่นๆ</h1>', 'h1');
+html = mustReplace(html, /<figure class="gb-block-image gb-block-image-64b7bd29 product-brands">[\s\S]*?<\/figure>/, categoryOverview, 'brand figure -> category overview');
+html = mustReplace(
+  html,
+  /<p class="wp-block-paragraph product-lead">[\s\S]*?<\/p>/,
+  '<p class="wp-block-paragraph product-lead">จำหน่ายสินค้าและอุปกรณ์สำหรับงานอุตสาหกรรมหลากหลายประเภท พร้อมบริการหลังการขายและคำแนะนำจากทีมงานที่มีประสบการณ์ ช่วยคัดเลือกสินค้าให้เหมาะกับเครื่องจักรและลักษณะการใช้งาน<br><br><span class="product-lead__contact">สอบถามข้อมูลเพิ่มเติม, เปรียบเทียบรุ่น หรือขอรับใบเสนอพร้อมเช็คสต๊อกสินค้า :: ฝ่ายขาย ::</span></p>',
+  'product lead',
+);
+html = mustReplace(html, /<section class="product-brand-accordion"[\s\S]*?<\/section>/, productAccordion, 'brand accordion');
+html = mustReplaceAll(html, 'ตัวอย่างอุปกรณ์นิวเมติกที่จัดส่งจริง', 'ตัวอย่างสินค้าอุตสาหกรรมที่จัดส่งจริง', 'proof heading');
 ---
 
 <BaseLayout
@@ -60,6 +69,8 @@ const html = (template?.html ?? '')
   canonical="https://pneumaticth.com/industrial-products/"
   footerHtml={footerHtml}
   ogImage="/images/products/homa-appliances-ERXFD4jLpJc-unsplash.webp"
+  heroSrcset="/images/products/homa-appliances-ERXFD4jLpJc-unsplash-768w.webp 768w, /images/products/homa-appliances-ERXFD4jLpJc-unsplash.webp 1200w"
+  heroSizes="(max-width: 1200px) 100vw, 1200px"
   route="industrial-products"
 >
   <article class="legacy-content" set:html={html} />

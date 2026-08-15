@@ -1,8 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import pages from '../data/pages.json';
-
-const footerHtml = pages.find((page) => !page.redirect)?.footerHtml || '';
+import footerHtml from '../data/footer.html?raw';
 ---
 <BaseLayout
   title="ไม่พบหน้าที่ต้องการ | Pneumatic Dotcom Thailand"
