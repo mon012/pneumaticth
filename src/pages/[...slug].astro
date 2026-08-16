@@ -2,7 +2,8 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import pages from '../data/pages.json';
 import footerHtml from '../data/footer.html?raw';
-import { mustReplace, youtubeFacade, hasYoutube } from '../lib/content.js';
+import imageVariants from '../data/image-variants.json';
+import { mustReplace, youtubeFacade, hasYoutube, breadcrumbTrail, withBreadcrumb, responsiveImages } from '../lib/content.js';
 
 export function getStaticPaths() {
   return pages.map((page) => ({ params: { slug: page.route || undefined }, props: page }));
@@ -16,10 +17,10 @@ const industrialCard = `
 
 <h3 class="gb-headline gb-headline-text">สินค้าอุตสาหกรรมอื่นๆ</h3>
 
-<a class="gb-button gb-button-text" href="/industrial-products/">รายละเอียด</a>
+<a class="gb-button gb-button-text" href="/industrial-products/">ดูสินค้าอุตสาหกรรมอื่นๆ</a>
 
 </div></div>`;
-const homeCardAnchor = `<a class="gb-button gb-button-9b792ea7 gb-button-text" href="/filter/">รายละเอียด</a>
+const homeCardAnchor = `<a class="gb-button gb-button-9b792ea7 gb-button-text" href="/filter/">ดูไส้กรองอุตสาหกรรม</a>
 
 </div></div>`;
 // mustReplace throws at build time if the fragment stops matching, so a content
@@ -27,7 +28,12 @@ const homeCardAnchor = `<a class="gb-button gb-button-9b792ea7 gb-button-text" h
 const rawHtml = !page.route
   ? mustReplace(page.html, homeCardAnchor, `${homeCardAnchor}\n\n${industrialCard}`, 'home: industrial products card')
   : page.html;
-const pageHtml = youtubeFacade(rawHtml);
+// responsiveImages runs last so the hero <img> read below already carries the
+// srcset/sizes that BaseLayout preloads.
+const pageHtml = responsiveImages(
+  withBreadcrumb(youtubeFacade(rawHtml), breadcrumbTrail(page.route || '', page.title)),
+  imageVariants,
+);
 // The first <img> of a page is its hero (LCP). Pass its srcset/sizes along so the
 // <link rel=preload> in BaseLayout picks the SAME candidate the layout will use —
 // preloading without them downloads the full-size file on every device.

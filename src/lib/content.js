@@ -68,3 +68,162 @@ export function youtubeFacade(html) {
 
 /** True when the page contains at least one YouTube facade. */
 export const hasYoutube = (html) => html.includes('class="yt-facade"');
+
+/* -------------------------------------------------------------------------
+ * Responsive images
+ *
+ * scripts/generate-image-variants.mjs writes width variants next to each
+ * original and records them in src/data/image-variants.json. This attaches the
+ * srcset, and a `sizes` that matches the slot the image actually renders into —
+ * the legacy `sizes` claimed 100vw for grid cells barely a quarter that wide,
+ * so browsers downloaded the largest candidate every time.
+ *
+ * Widths below are derived from src/styles/global.css: --container is 1180px,
+ * page gutters are 24px (18px under 860px), so 1227px is the viewport at which
+ * the container stops growing.
+ * ---------------------------------------------------------------------- */
+
+/**
+ * Layout section -> the `sizes` its images render at. `first` covers galleries
+ * whose opening tile spans two columns and two rows.
+ */
+const SIZE_RULES = {
+  // 4-column proof gallery on the product pages.
+  'product-proof': {
+    first: '(max-width:860px) calc(100vw - 36px), (max-width:1227px) calc(50vw - 30px), 584px',
+    rest: '(max-width:560px) calc(100vw - 36px), (max-width:860px) calc(50vw - 24px), (max-width:1227px) calc(25vw - 21px), 286px',
+  },
+  // 2-column gallery in the about page main column, which shares the row with
+  // the contact card — so each tile is a quarter of the container, not a half.
+  'about-gallery': {
+    first: '(max-width:560px) calc(100vw - 36px), (max-width:1227px) calc(50vw - 8px), 580px',
+    rest: '(max-width:560px) calc(100vw - 36px), (max-width:1227px) calc(25vw - 10px), 284px',
+  },
+  // 3-column related-posts grid at the foot of every article.
+  'article-related': {
+    rest: '(max-width:760px) calc(100vw - 36px), (max-width:1227px) calc(33.3vw - 30px), 377px',
+  },
+  // 2-column card grid on /blog/.
+  'blog-grid': {
+    rest: '(max-width:720px) calc(100vw - 36px), (max-width:1227px) calc(50vw - 36px), 548px',
+  },
+  // Article prose column: min(860px,100%) minus 24px gutters.
+  'article-body': {
+    rest: '(max-width:760px) calc(100vw - 36px), (max-width:907px) calc(100vw - 48px), 812px',
+    // ...and the 2-column gallery nested inside it.
+    gallery: '(max-width:760px) calc(100vw - 36px), (max-width:907px) calc(50vw - 30px), 400px',
+  },
+  // Brand logo strip above the product lead.
+  'product-brands': { rest: '(max-width:560px) calc(100vw - 36px), 500px' },
+  // Full-bleed hero images.
+  'page-banner': { rest: '100vw', heroOnly: true },
+  'article-hero': { rest: '100vw', heroOnly: true },
+  // Trust badges under the about lead; they render at a fixed small size.
+  'about-verification-links': { rest: '64px' },
+};
+const SECTION_MARKERS = Object.keys(SIZE_RULES);
+
+/** Which SIZE_RULES section an <img> at `index` sits in, or null if none. */
+function sectionAt(html, index) {
+  let best = null;
+  let bestAt = -1;
+  for (const marker of SECTION_MARKERS) {
+    const at = html.lastIndexOf(marker, index);
+    if (at > bestAt) {
+      bestAt = at;
+      best = marker;
+    }
+  }
+  return best ? { name: best, at: bestAt } : null;
+}
+
+export function responsiveImages(html, manifest) {
+  const seen = new Map();
+  return html.replace(/<img\b[^>]*>/gi, (tag, index) => {
+    const section = sectionAt(html, index);
+    if (!section) return tag;
+    const rules = SIZE_RULES[section.name];
+
+    // Count every image in the section, including ones skipped below, so the
+    // "first tile spans two columns" rule tracks the real DOM order.
+    const nth = (seen.get(section.at) ?? 0) + 1;
+    seen.set(section.at, nth);
+
+    if (/\ssrcset=/i.test(tag)) return tag; // already responsive
+    // A hero section also contains small inline images (trust badges, icons);
+    // only the post thumbnail itself is actually full-bleed.
+    if (rules.heroOnly && !/\bwp-post-image\b/.test(tag)) return tag;
+    const entry = manifest[attr(tag, 'src')];
+    if (!entry) return tag;
+
+    const inGallery = rules.gallery && html.lastIndexOf('wp-block-gallery', index) > section.at;
+    const sizes = inGallery ? rules.gallery : nth === 1 && rules.first ? rules.first : rules.rest;
+
+    const srcset = entry.variants.map((v) => `${v.url} ${v.width}w`).join(', ');
+    return tag
+      .replace(/\ssizes="[^"]*"/i, '')
+      .replace(/>$/, ` srcset="${srcset}" sizes="${sizes}">`);
+  });
+}
+
+/* -------------------------------------------------------------------------
+ * Breadcrumbs
+ *
+ * One trail definition feeds both the BreadcrumbList JSON-LD in BaseLayout and
+ * the visible <nav> injected into the page, so the two can never disagree.
+ * ---------------------------------------------------------------------- */
+
+/** Routes that live under /blog/ and therefore get a three-level trail. */
+const BLOG_ARTICLES = new Set([
+  'aftercoolers-factory',
+  'air-compressor',
+  'hydraulic-cylinder-overhaul',
+  'plc-type',
+  'purchasing-department-tips',
+]);
+
+/** Routes with no breadcrumb: the home page is the root, 404 is not a place. */
+const NO_BREADCRUMB = new Set(['', '404']);
+
+/**
+ * Build the breadcrumb trail for a route.
+ *
+ * The last crumb uses the page title with the " | Pneumatic Dotcom" brand
+ * suffix stripped — the brand is already the first crumb's site, and Google
+ * shows the raw crumb names in the search result.
+ */
+export function breadcrumbTrail(route, title) {
+  if (NO_BREADCRUMB.has(route)) return [];
+  const trail = [{ name: 'หน้าแรก', url: '/' }];
+  if (BLOG_ARTICLES.has(route)) trail.push({ name: 'บทความ', url: '/blog/' });
+  trail.push({ name: title.split(' | ')[0].trim(), url: `/${route}/` });
+  return trail;
+}
+
+/** Render the visible breadcrumb nav. Returns '' for an empty trail. */
+export function breadcrumbHtml(trail) {
+  if (!trail.length) return '';
+  const items = trail
+    .map((crumb, i) =>
+      i === trail.length - 1
+        ? `<li><span aria-current="page">${escape(crumb.name)}</span></li>`
+        : `<li><a href="${crumb.url}">${escape(crumb.name)}</a></li>`,
+    )
+    .join('');
+  return `<nav class="breadcrumb" aria-label="เส้นทางนำทาง"><ol>${items}</ol></nav>`;
+}
+
+/**
+ * Insert the breadcrumb nav between the page hero and the page body.
+ *
+ * Every non-home page opens its body with one of these two wrappers right after
+ * the hero <header>, so this lands the nav below the hero image on every
+ * template without needing per-page patterns.
+ */
+const CONTENT_WRAPPER = /<div class="(?:page-content|single-content)[^"]*">/;
+
+export function withBreadcrumb(html, trail) {
+  const nav = breadcrumbHtml(trail);
+  if (!nav) return html;
+  return mustReplace(html, CONTENT_WRAPPER, (match) => `${nav}${match}`, 'breadcrumb insertion point');
+}

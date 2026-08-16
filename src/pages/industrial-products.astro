@@ -2,7 +2,8 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import pages from '../data/pages.json';
 import footerHtml from '../data/footer.html?raw';
-import { mustReplace, mustReplaceAll } from '../lib/content.js';
+import imageVariants from '../data/image-variants.json';
+import { mustReplace, mustReplaceAll, breadcrumbTrail, withBreadcrumb, responsiveImages } from '../lib/content.js';
 
 const template = pages.find((page) => page.route === 'pneumatic');
 if (!template) throw new Error('[industrial-products] pneumatic page missing from pages.json');
@@ -61,6 +62,8 @@ html = mustReplace(
 );
 html = mustReplace(html, /<section class="product-brand-accordion"[\s\S]*?<\/section>/, productAccordion, 'brand accordion');
 html = mustReplaceAll(html, 'ตัวอย่างอุปกรณ์นิวเมติกที่จัดส่งจริง', 'ตัวอย่างสินค้าอุตสาหกรรมที่จัดส่งจริง', 'proof heading');
+html = withBreadcrumb(html, breadcrumbTrail('industrial-products', title));
+html = responsiveImages(html, imageVariants);
 ---
 
 <BaseLayout

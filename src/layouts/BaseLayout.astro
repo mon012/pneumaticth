@@ -1,18 +1,33 @@
 ---
 import '../styles/global.css';
+import { breadcrumbTrail } from '../lib/content.js';
 const { title, description = '', canonical = '/', isHome = false, footerHtml = '', ogImage, route = '', noindex = false, hasVideo = false, heroSrcset, heroSizes } = Astro.props;
 const lineHref = 'https://lin.ee/UCQRpej';
+const mapHref = 'https://goo.gl/maps/hwugnzhLCh92';
 const siteUrl = new URL('https://pneumaticth.com');
 const canonicalUrl = new URL(canonical, siteUrl).href;
-const socialImageUrl = new URL(ogImage || '/favicon.webp', siteUrl).href;
+// Pages without a hero (privacy, 404) used to fall back to the 58x58 favicon,
+// which social cards render as a thumbnail inside a summary_large_image frame.
+const socialImageUrl = new URL(ogImage || '/images/og-default.jpg', siteUrl).href;
 const fallbackDescription = 'จำหน่ายอุปกรณ์นิวเมติก อุปกรณ์ไฮดรอลิค และไส้กรองอุตสาหกรรม พร้อมบริการจากทีมวิศวกรและจัดส่งทั่วประเทศ';
 const metaDescription = description || fallbackDescription;
 const articleRoutes = new Set(['aftercoolers-factory', 'air-compressor', 'hydraulic-cylinder-overhaul', 'plc-type', 'purchasing-department-tips']);
 const collectionRoutes = new Set(['blog']);
 const pageType = isHome ? 'WebPage' : articleRoutes.has(route) ? 'Article' : collectionRoutes.has(route) ? 'CollectionPage' : route === 'about' ? 'AboutPage' : route === 'privacy' ? 'WebPage' : 'WebPage';
+// Same trail the visible <nav> is built from, so schema and page always agree.
+const trail = breadcrumbTrail(route, title);
 const organizationId = `${siteUrl.href}#organization`;
 const websiteId = `${siteUrl.href}#website`;
 const pageId = `${canonicalUrl}#webpage`;
+const areaServed = { '@type': 'Country', name: 'ประเทศไทย' };
+// The four commercial pages. Each one describes an offering rather than an
+// article, so it also emits a Service node pointing back at this page.
+const services = {
+  pneumatic: { name: 'จำหน่ายอุปกรณ์นิวเมติก', serviceType: 'อุปกรณ์นิวเมติก' },
+  hydraulic: { name: 'จำหน่ายอุปกรณ์ไฮดรอลิค', serviceType: 'อุปกรณ์ไฮดรอลิค' },
+  filter: { name: 'จำหน่ายไส้กรองอุตสาหกรรม', serviceType: 'ไส้กรองอุตสาหกรรม' },
+  'industrial-products': { name: 'จำหน่ายสินค้าอุตสาหกรรมอื่นๆ', serviceType: 'สินค้าอุตสาหกรรม' },
+};
 const graph = [
   {
     '@type': ['Organization', 'LocalBusiness'],
@@ -31,6 +46,29 @@ const graph = [
       addressRegion: 'กรุงเทพมหานคร',
       postalCode: '10900',
       addressCountry: 'TH',
+    },
+    geo: { '@type': 'GeoCoordinates', latitude: 13.844684, longitude: 100.543017 },
+    hasMap: mapHref,
+    openingHoursSpecification: [{
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      opens: '08:00',
+      closes: '17:00',
+    }],
+    areaServed,
+    knowsLanguage: ['th', 'en'],
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      name: 'สินค้าและบริการ',
+      itemListElement: Object.entries(services).map(([slug, service]) => ({
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'Service',
+          name: service.name,
+          serviceType: service.serviceType,
+          url: new URL(`/${slug}/`, siteUrl).href,
+        },
+      })),
     },
     sameAs: ['https://www.facebook.com/pneumaticth', 'https://share.google/rErhoQDN25KWoXiyz'],
   },
@@ -55,13 +93,25 @@ const graph = [
     primaryImageOfPage: { '@type': 'ImageObject', url: socialImageUrl },
     ...(articleRoutes.has(route) ? { author: { '@id': organizationId }, publisher: { '@id': organizationId } } : {}),
   },
-  ...(!isHome ? [{
+  ...(services[route] ? [{
+    '@type': 'Service',
+    '@id': `${canonicalUrl}#service`,
+    name: services[route].name,
+    serviceType: services[route].serviceType,
+    description: metaDescription,
+    provider: { '@id': organizationId },
+    areaServed,
+    mainEntityOfPage: { '@id': pageId },
+  }] : []),
+  ...(trail.length ? [{
     '@type': 'BreadcrumbList',
     '@id': `${canonicalUrl}#breadcrumb`,
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'หน้าแรก', item: siteUrl.href },
-      { '@type': 'ListItem', position: 2, name: title.split(' » ')[0], item: canonicalUrl },
-    ],
+    itemListElement: trail.map((crumb, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: crumb.name,
+      item: new URL(crumb.url, siteUrl).href,
+    })),
   }] : []),
 ];
 const structuredData = { '@context': 'https://schema.org', '@graph': graph };

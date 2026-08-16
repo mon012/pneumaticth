@@ -21,6 +21,9 @@ a:hover{color:var(--brand-dark)}
 :focus-visible{outline:3px solid var(--brand);outline-offset:3px}
 .skip-link{position:fixed;left:1rem;top:-8rem;z-index:100;background:#fff;padding:.75rem 1rem}
 .skip-link:focus{top:1rem}
+/* Text for screen readers and crawlers only: used to give short "อ่านต่อ"
+   buttons the destination title without changing the visual design. */
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 
 /* Site header, primary nav and LINE call-to-action */
 .site-header{position:sticky;top:0;z-index:50;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:2rem;min-height:84px;padding:10px max(24px,calc((100vw - var(--container))/2));background:rgba(255,255,255,.96);box-shadow:0 1px 0 var(--line);font-family:"Maledpan",Arial,sans-serif}
@@ -32,6 +35,17 @@ a:hover{color:var(--brand-dark)}
 .line-cta svg{flex:0 0 24px}
 .line-cta:hover{background:var(--line-green-dark);transform:translateY(-1px)}
 .menu-toggle{display:none}
+
+/* Breadcrumbs — sits between the page hero and the page body */
+.breadcrumb{width:min(var(--container),100%);margin:0 auto;padding:1.1rem max(24px,calc((100vw - var(--container))/2)) 0}
+.breadcrumb ol{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin:0;padding:0;list-style:none;color:var(--muted);font-size:16px;line-height:1.5}
+.breadcrumb li{display:flex;align-items:center;gap:.5rem;min-width:0}
+.breadcrumb li+li::before{content:"›";color:var(--line);font-size:1.15em}
+.breadcrumb a{color:var(--muted);text-decoration:none}
+.breadcrumb a:hover{color:var(--brand);text-decoration:underline;text-underline-offset:.2em}
+.breadcrumb [aria-current="page"]{color:var(--ink);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:860px){.breadcrumb{padding-inline:18px}}
+@media(max-width:560px){.breadcrumb ol{font-size:15px}.breadcrumb [aria-current="page"]{max-width:100%}}
 
 /* Content shell and legacy WordPress typography */
 #content{min-height:60vh}
@@ -135,7 +149,9 @@ a:hover{color:var(--brand-dark)}
 .about-landing .about-more-work a:hover{background:var(--brand-dark)}
 .about-landing .about-contact-card{grid-column:2;grid-row:1/span 2;padding:clamp(1.6rem,3vw,2.25rem);border-radius:var(--radius);background:#fff;box-shadow:0 18px 46px rgba(23,48,92,.13)}
 .about-landing .about-contact-card .gb-container{padding:0;background:none;box-shadow:none}
-.about-landing .about-contact-card h4{margin:0 0 .65rem;font-size:1.35rem}
+/* The contact-card heading moved h4 -> h2 to stop skipping heading levels;
+   :is(h2,h4) keeps the same specificity and the same rendering. */
+.about-landing .about-contact-card :is(h2,h4){margin:0 0 .65rem;font-size:1.35rem}
 .about-landing .about-contact-card p{display:flex;align-items:flex-start;gap:.7rem;max-width:none;margin:.5rem 0;line-height:1.55}
 .about-landing .about-contact-card p.wp-block-paragraph{display:block;margin-bottom:1.15rem;color:var(--muted)}
 .about-landing .about-contact-card .gb-icon{display:inline-grid;flex:0 0 1.15rem;place-items:center;height:1.55em}
@@ -240,6 +256,10 @@ a:hover{color:var(--brand-dark)}
 .blog-landing .blog-card .entry-title{margin:0 0 1.5rem;font-size:clamp(1.35rem,2.2vw,1.75rem);line-height:1.3;letter-spacing:-.01em}
 .blog-landing .blog-card .entry-title a{color:var(--ink);text-decoration:none}
 .blog-landing .blog-card .entry-title a:hover{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:.2em}
+/* Cards now carry an excerpt, so the title sits closer to the text below it. */
+.blog-landing .blog-card .entry-title:has(+.entry-excerpt),.article-related-card .entry-title:has(+.entry-excerpt){margin-bottom:.6rem}
+.blog-landing .blog-intro{max-width:70ch;margin:0 0 clamp(2rem,4vw,3rem);color:var(--muted);font-size:clamp(1.05rem,1.6vw,1.2rem)}
+.blog-landing .blog-card .entry-excerpt{margin:0 0 1.25rem;color:var(--muted);font-size:1.05rem;line-height:1.6}
 .blog-landing .blog-card .entry-more{margin-top:auto}
 .blog-landing .blog-card .btn-readmore{display:inline-flex;min-height:44px;align-items:center;color:var(--brand);font-weight:700;text-underline-offset:.25em}
 .blog-landing .s-paging{margin-top:2.5rem}
@@ -281,6 +301,7 @@ a:hover{color:var(--brand-dark)}
 .article-related-card .entry-title{margin:0 0 1rem;font-size:1.3rem;line-height:1.3}
 .article-related-card .entry-title a{color:var(--ink);text-decoration:none}
 .article-related-card .entry-title a:hover{text-decoration:underline;text-underline-offset:.2em}
+.article-related-card .entry-excerpt{margin:0 0 1.1rem;color:var(--muted);font-size:1rem;line-height:1.55}
 .article-related-card .entry-more{margin-top:auto}
 .article-related-card .btn-readmore{display:inline-flex;min-height:44px;align-items:center;font-weight:700}
 
@@ -434,17 +455,24 @@ a{color:var(--brand);text-underline-offset:.2em}
 
 /* WordPress block primitives (cover, grid, banner, embed) (continued) */
 .wp-block-cover h1{max-width:12ch;margin:1.2rem 0 .45rem}
+/* The home H1 carries the Thai product keywords, so it is longer than the
+   English headline it replaced and needs a wider measure and smaller type.
+   Chrome's Thai line breaker splits "ไฮดรอลิค" mid-word, so each phrase is its
+   own nowrap span and lines can only break at the spaces between them. */
+.home .wp-block-cover h1{max-width:24ch;margin:.35rem 0 .6rem;font-size:clamp(1.85rem,3.6vw,3.25rem)}
+.home .wp-block-cover h1 span{white-space:nowrap}
+.home .home-hero-eyebrow{margin:0;color:#cddcff;font-size:clamp(1rem,1.5vw,1.2rem);font-weight:700;letter-spacing:.12em;text-transform:uppercase}
 
 /* Home: hero and customer logo marquee (continued) */
 .home .gb-container-a60ac8ea h2{width:min(var(--container),calc(100% - 48px));margin:0 auto 2rem;text-align:center;font-size:28.71px}
 
 /* Home: content sections and product cards (continued) */
-.home .gb-container-03dbc959 h4{margin:0 0 .5rem;font-size:22px}
+.home .gb-container-03dbc959 :is(h2,h4){margin:0 0 .5rem;font-size:22px}
 .home :is(.pneumatic-product-card,.hydraulic-product-card,.filter-product-card,.industrial-product-card) h3{margin:0 0 .75rem;color:#fff;text-shadow:0 1px 14px rgba(0,0,0,.28)}
 
 /* Product landing pages (continued) */
 .product-landing{max-width:none!important;padding:0!important}
-.product-landing .product-contact-card h4{margin:0 0 .65rem;font-size:1.35rem}
+.product-landing .product-contact-card :is(h2,h4){margin:0 0 .65rem;font-size:1.35rem}
 .product-landing .product-proof-title{margin:0;font-size:clamp(1.75rem,3vw,2.5rem);text-align:left}
 .legacy-content:has(.product-landing) .page-banner h1{position:absolute;left:max(24px,calc((100vw - var(--container))/2));bottom:clamp(2.5rem,6vw,4.5rem);z-index:2;width:min(var(--container),calc(100% - 48px));margin:0;text-align:left;font-size:clamp(2.5rem,5vw,4.6rem);color:#fff}
 .industrial-category-overview h2{margin:0 0 1rem;font-size:clamp(1.45rem,2.4vw,2rem);line-height:1.3}
