@@ -227,3 +227,52 @@ export function withBreadcrumb(html, trail) {
   if (!nav) return html;
   return mustReplace(html, CONTENT_WRAPPER, (match) => `${nav}${match}`, 'breadcrumb insertion point');
 }
+
+/* -------------------------------------------------------------------------
+ * FAQ
+ *
+ * Same arrangement as the breadcrumbs above: one `faq` array in pages.json
+ * feeds both the visible Q&A appended to the article and the FAQPage node in
+ * BaseLayout, so the answer a reader sees and the answer a crawler reads can
+ * never drift apart.
+ *
+ * Worth knowing: Google restricted FAQ rich results to government and health
+ * sites in August 2023, so this markup will not produce an expanded snippet
+ * here. It is emitted because the Q&A is genuinely on the page and answer
+ * engines still read it — the visible copy is the point, not the schema.
+ * ---------------------------------------------------------------------- */
+
+/**
+ * Render the visible FAQ block. Returns '' when a page has no FAQ.
+ *
+ * Flat headings and paragraphs rather than a wrapping <section>, because
+ * global.css:527 centres only the DIRECT children of .single-content — inside
+ * a wrapper the answers lose the 72ch centring and sit 29px left of every
+ * other paragraph in the article.
+ */
+export function faqHtml(faq) {
+  if (!faq?.length) return '';
+  const items = faq
+    .map(
+      (item) =>
+        `<h3 class="wp-block-heading">${escape(item.q)}</h3>` +
+        `<p class="wp-block-paragraph">${escape(item.a)}</p>`,
+    )
+    .join('');
+  return `<h2 class="wp-block-heading">คำถามที่พบบ่อย</h2>${items}`;
+}
+
+/**
+ * Append the FAQ to the end of the article body.
+ *
+ * Every article closes its body immediately before the related-posts section,
+ * so this one pattern lands the block inside the prose column — where it
+ * inherits the article typography — on all of them.
+ */
+const ARTICLE_BODY_END = '</div>    <div class="s-sec single-related';
+
+export function withFaq(html, faq) {
+  const block = faqHtml(faq);
+  if (!block) return html;
+  return mustReplace(html, ARTICLE_BODY_END, `${block}${ARTICLE_BODY_END}`, 'faq insertion point');
+}

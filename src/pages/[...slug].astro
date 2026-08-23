@@ -3,7 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import pages from '../data/pages.json';
 import footerHtml from '../data/footer.html?raw';
 import imageVariants from '../data/image-variants.json';
-import { mustReplace, youtubeFacade, hasYoutube, breadcrumbTrail, withBreadcrumb, responsiveImages } from '../lib/content.js';
+import { mustReplace, youtubeFacade, hasYoutube, breadcrumbTrail, withBreadcrumb, withFaq, responsiveImages } from '../lib/content.js';
 
 export function getStaticPaths() {
   return pages.map((page) => ({ params: { slug: page.route || undefined }, props: page }));
@@ -31,7 +31,7 @@ const rawHtml = !page.route
 // responsiveImages runs last so the hero <img> read below already carries the
 // srcset/sizes that BaseLayout preloads.
 const pageHtml = responsiveImages(
-  withBreadcrumb(youtubeFacade(rawHtml), breadcrumbTrail(page.route || '', page.title)),
+  withFaq(withBreadcrumb(youtubeFacade(rawHtml), breadcrumbTrail(page.route || '', page.title)), page.faq),
   imageVariants,
 );
 // The first <img> of a page is its hero (LCP). Pass its srcset/sizes along so the
@@ -52,6 +52,7 @@ const heroSizes = heroTag.match(/\ssizes="([^"]+)"/)?.[1];
   heroSrcset={heroSrcset}
   heroSizes={heroSizes}
   route={page.route || ''}
+  faq={page.faq}
   hasVideo={hasYoutube(pageHtml)}
 >
   <article class="legacy-content" set:html={pageHtml} />

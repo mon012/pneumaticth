@@ -1,7 +1,7 @@
 ---
 import '../styles/global.css';
 import { breadcrumbTrail } from '../lib/content.js';
-const { title, description = '', canonical = '/', isHome = false, footerHtml = '', ogImage, route = '', noindex = false, hasVideo = false, heroSrcset, heroSizes } = Astro.props;
+const { title, description = '', canonical = '/', isHome = false, footerHtml = '', ogImage, route = '', noindex = false, hasVideo = false, heroSrcset, heroSizes, faq = [] } = Astro.props;
 const lineHref = 'https://lin.ee/UCQRpej';
 const mapHref = 'https://goo.gl/maps/hwugnzhLCh92';
 const siteUrl = new URL('https://pneumaticth.com');
@@ -103,6 +103,19 @@ const graph = [
     provider: { '@id': organizationId },
     areaServed,
     mainEntityOfPage: { '@id': pageId },
+  }] : []),
+  // The questions rendered into the page body by withFaq, as their own node.
+  // Google stopped showing FAQ rich results for sites like this one in August
+  // 2023; this is here because answer engines still read it, not for a snippet.
+  ...(faq.length ? [{
+    '@type': 'FAQPage',
+    '@id': `${canonicalUrl}#faq`,
+    url: canonicalUrl,
+    mainEntity: faq.map((item) => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: { '@type': 'Answer', text: item.a },
+    })),
   }] : []),
   ...(trail.length ? [{
     '@type': 'BreadcrumbList',
