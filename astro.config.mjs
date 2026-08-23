@@ -14,7 +14,7 @@ const lastmodByUrl = new Map(
 );
 // industrial-products is built by its own route file from the pneumatic
 // template, so it is not in pages.json and needs its date named here.
-lastmodByUrl.set(`${site}/industrial-products/`, '2026-08-16');
+lastmodByUrl.set(`${site}/industrial-products/`, '2026-08-23');
 
 export default defineConfig({
   site,

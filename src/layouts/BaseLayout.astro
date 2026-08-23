@@ -9,7 +9,7 @@ const canonicalUrl = new URL(canonical, siteUrl).href;
 // Pages without a hero (privacy, 404) used to fall back to the 58x58 favicon,
 // which social cards render as a thumbnail inside a summary_large_image frame.
 const socialImageUrl = new URL(ogImage || '/images/og-default.jpg', siteUrl).href;
-const fallbackDescription = 'จำหน่ายอุปกรณ์นิวเมติก อุปกรณ์ไฮดรอลิค และไส้กรองอุตสาหกรรม พร้อมบริการจากทีมวิศวกรและจัดส่งทั่วประเทศ';
+const fallbackDescription = 'จำหน่ายอุปกรณ์นิวเมติกส์ อุปกรณ์ไฮดรอลิค และไส้กรองอุตสาหกรรม พร้อมบริการจากทีมวิศวกรและจัดส่งทั่วประเทศ';
 const metaDescription = description || fallbackDescription;
 const articleRoutes = new Set(['aftercoolers-factory', 'air-compressor', 'hydraulic-cylinder-overhaul', 'plc-type', 'purchasing-department-tips']);
 const collectionRoutes = new Set(['blog']);
@@ -76,7 +76,8 @@ const graph = [
     '@type': 'WebSite',
     '@id': websiteId,
     url: siteUrl.href,
-    name: 'Pneumatic Dotcom Thailand',
+    name: 'นิวเมติก ดอทคอม',
+    alternateName: 'Pneumatic Dotcom Thailand',
     inLanguage: 'th-TH',
     publisher: { '@id': organizationId },
   },
@@ -139,7 +140,7 @@ const structuredData = { '@context': 'https://schema.org', '@graph': graph };
     <link rel="canonical" href={canonicalUrl} />
     <meta property="og:locale" content="th_TH" />
     <meta property="og:type" content={articleRoutes.has(route) ? 'article' : 'website'} />
-    <meta property="og:site_name" content="Pneumatic Dotcom Thailand" />
+    <meta property="og:site_name" content="นิวเมติก ดอทคอม" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={metaDescription} />
     <meta property="og:url" content={canonicalUrl} />
