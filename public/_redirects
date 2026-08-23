@@ -1,3 +1,12 @@
+# Cloudflare Pages redirects.
+#
+# Order matters: the top-most rule that matches wins, and Cloudflare requires
+# static rules before dynamic ones (those containing * or :placeholder).
+# Limit is 2,000 static + 100 dynamic; the dynamic rules below use ~40.
+
+# ---------------------------------------------------------------------------
+# 1. Legacy WordPress taxonomies (pre-redesign)
+# ---------------------------------------------------------------------------
 /category/uncategorized/  /blog/  301
 /uncategorized/           /blog/  301
 /บทความ/                  /blog/  301
@@ -5,3 +14,132 @@
 /gefran/                  /industrial-products/  301
 /tag/air-compressor/      /blog/  301
 /tag/plc/                 /blog/  301
+
+# ---------------------------------------------------------------------------
+# 2. WooCommerce shop root
+#
+# The home page is the closest equivalent: it lists all four product
+# categories, which is exactly what /shop/ used to do.
+# ---------------------------------------------------------------------------
+/shop      /  301
+/shop/     /  301
+
+# ---------------------------------------------------------------------------
+# 3. Brand archives -> the category page that still sells that brand
+#
+# Brand assignments follow the accordions on each product page, so a redirect
+# always lands on a page that actually names the brand:
+#   /pneumatic/ -> SMC, FESTO, Norgren, Parker
+#   /hydraulic/ -> Yuken, Rexroth, Nachi, Eaton
+#   /filter/    -> HYDAC, MAHLE, Internormen, Filtrec, Fleetguard,
+#                  MANN-FILTER, Donaldson, Pall
+# ---------------------------------------------------------------------------
+/brand/smc/          /pneumatic/  301
+/brand/festo/        /pneumatic/  301
+/brand/norgren/      /pneumatic/  301
+/brand/parker/       /pneumatic/  301
+/brand/ckd/          /pneumatic/  301
+/brand/airtac/       /pneumatic/  301
+/brand/camozzi/      /pneumatic/  301
+/brand/yuken/        /hydraulic/  301
+/brand/rexroth/      /hydraulic/  301
+/brand/nachi/        /hydraulic/  301
+/brand/eaton/        /hydraulic/  301
+/brand/hydac/        /filter/     301
+/brand/mahle/        /filter/     301
+/brand/internormen/  /filter/     301
+/brand/filtrec/      /filter/     301
+/brand/fleetguard/   /filter/     301
+/brand/mann-filter/  /filter/     301
+/brand/mann/         /filter/     301
+/brand/donaldson/    /filter/     301
+/brand/pall/         /filter/     301
+/brand/taisei/       /filter/     301
+/brand/wilkerson/    /filter/     301
+/brand/gefran/       /industrial-products/  301
+/brand/danfoss/      /industrial-products/  301
+
+# ---------------------------------------------------------------------------
+# 4. Product category archives (page 1)
+# ---------------------------------------------------------------------------
+/product-category/filter/     /filter/     301
+/product-category/indicator/  /filter/     301
+/product-category/fitting/    /pneumatic/  301
+/product-category/valve/      /pneumatic/  301
+/product-category/cylinder/   /pneumatic/  301
+/product-category/regulator/  /pneumatic/  301
+/product-category/silencer/   /pneumatic/  301
+/product-category/pneumatic/  /pneumatic/  301
+/product-category/pump/       /hydraulic/  301
+/product-category/hydraulic/  /hydraulic/  301
+
+# ---------------------------------------------------------------------------
+# 5. Paginated category archives (/product-category/filter/page/3/)
+#
+# Full-segment splats, so these work regardless of how Cloudflare handles a
+# splat that starts mid-segment (see the note in section 6).
+# ---------------------------------------------------------------------------
+/product-category/filter/*     /filter/     301
+/product-category/indicator/*  /filter/     301
+/product-category/fitting/*    /pneumatic/  301
+/product-category/valve/*      /pneumatic/  301
+/product-category/cylinder/*   /pneumatic/  301
+/product-category/regulator/*  /pneumatic/  301
+/product-category/silencer/*   /pneumatic/  301
+/product-category/pneumatic/*  /pneumatic/  301
+/product-category/pump/*       /hydraulic/  301
+/product-category/hydraulic/*  /hydraulic/  301
+/shop/*                        /            301
+
+# ---------------------------------------------------------------------------
+# 6. Individual products, matched on the brand prefix of the slug
+#
+# Every legacy product slug was "brand-type-model"
+# (smc-fitting-kq2l06-01as, hydac-filter-1263632-0180-ma-003-bn,
+# yuken-solenoid-valve-dsg-01-2d2-a110-50), so the brand prefix routes each
+# product to the category page that still carries it.
+#
+# These splats start mid-segment, which Cloudflare's docs neither document nor
+# forbid. If they turn out not to match, the catch-all in section 7 still
+# catches every /product/ URL — the failure mode is a less precise redirect,
+# never a 404. Verify after deploy with the curl loop in the commit message.
+# ---------------------------------------------------------------------------
+/product/smc-*        /pneumatic/  301
+/product/festo-*      /pneumatic/  301
+/product/norgren-*    /pneumatic/  301
+/product/parker-*     /pneumatic/  301
+/product/ckd-*        /pneumatic/  301
+/product/airtac-*     /pneumatic/  301
+/product/camozzi-*    /pneumatic/  301
+/product/pneumatic-*  /pneumatic/  301
+/product/yuken-*      /hydraulic/  301
+/product/rexroth-*    /hydraulic/  301
+/product/nachi-*      /hydraulic/  301
+/product/eaton-*      /hydraulic/  301
+/product/hydraulic-*  /hydraulic/  301
+/product/hydac-*      /filter/     301
+/product/mahle-*      /filter/     301
+/product/internormen-*  /filter/   301
+/product/filtrec-*    /filter/     301
+/product/fleetguard-*  /filter/    301
+/product/mann-*       /filter/     301
+/product/donaldson-*  /filter/     301
+/product/pall-*       /filter/     301
+/product/taisei-*     /filter/     301
+/product/wilkerson-*  /filter/     301
+/product/filter-*     /filter/     301
+/product/gefran-*     /industrial-products/  301
+/product/danfoss-*    /industrial-products/  301
+
+# ---------------------------------------------------------------------------
+# 7. Catch-alls for anything the rules above missed
+#
+# /product/ goes to /pneumatic/ rather than the home page: every one of the 53
+# legacy product URLs that still had impressions was a pneumatic-supply item,
+# so it is the topically closest page and avoids the soft-404 signal Google
+# gives to "many URLs -> home page". Unknown brand and category archives do go
+# home, because the home page is the one that lists all four categories.
+# ---------------------------------------------------------------------------
+/product/*           /pneumatic/  301
+/product-category/*  /  301
+/brand/*             /  301
