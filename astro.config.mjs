@@ -26,7 +26,10 @@ export default defineConfig({
   // /engineer/, /uncategorized/, /category/uncategorized/, /บทความ/, /gefran/ and
   // the /tag/ archives are 301'd by public/_redirects, so they are not built.
   integrations: [sitemap({
-    filter: (page) => page !== `${site}/404/`,
+    // /404/ is not a page, and /thx/ is the form's redirect target: indexing it
+    // puts a dead end in the search results and lets search traffic fire the
+    // Google Ads conversion that only a real form submission should.
+    filter: (page) => page !== `${site}/404/` && page !== `${site}/thx/`,
     serialize(item) {
       const lastmod = lastmodByUrl.get(item.url);
       if (!lastmod) throw new Error(`[sitemap] no lastmod for ${item.url} — add one in src/data/pages.json`);

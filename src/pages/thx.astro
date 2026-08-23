@@ -1,0 +1,62 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import footerHtml from '../data/footer.html?raw';
+
+// Where the Deftform submission redirects. It is noindex and excluded from the
+// sitemap in astro.config.mjs: a thank-you page that gets indexed shows up in
+// search results as a dead end, and every visitor who arrives from search
+// instead of from the form inflates the conversion count in Google Ads.
+const lineHref = 'https://lin.ee/UCQRpej';
+---
+
+<BaseLayout
+  title="ได้รับข้อมูลของคุณแล้ว | นิวเมติก ดอทคอม"
+  description="ขอบคุณสำหรับการติดต่อ ทีมงานฝ่ายขายได้รับรายละเอียดของคุณเรียบร้อยแล้ว"
+  canonical="/thx/"
+  route="thx"
+  noindex={true}
+  footerHtml={footerHtml}
+>
+  <article class="thx-page">
+    <p class="thx-mark" aria-hidden="true">✓</p>
+    <h1>ได้รับข้อมูลของคุณแล้ว</h1>
+    <p class="thx-lead">
+      ขอบคุณที่ติดต่อเข้ามา ทีมงานฝ่ายขายได้รับรายละเอียดของคุณเรียบร้อยแล้ว
+      และจะติดต่อกลับตามช่องทางที่คุณระบุไว้ในแบบฟอร์ม
+    </p>
+    <p class="thx-hours">เวลาทำการ จันทร์–ศุกร์ 08:00–17:00 น.</p>
+
+    <div class="thx-actions">
+      <a class="thx-line" href={lineHref} target="_blank" rel="noopener noreferrer">คุยกับฝ่ายขายทาง LINE</a>
+      <a class="thx-call" href="tel:+66025916468">โทร 02-591-6468</a>
+    </div>
+
+    <nav class="thx-nav" aria-label="ลิงก์แนะนำ">
+      <a href="/">กลับหน้าแรก</a>
+      <a href="/pneumatic/">อุปกรณ์นิวเมติกส์</a>
+      <a href="/hydraulic/">อุปกรณ์ไฮดรอลิค</a>
+      <a href="/filter/">ไส้กรองอุตสาหกรรม</a>
+      <a href="/blog/">บทความ</a>
+    </nav>
+  </article>
+</BaseLayout>
+
+<style>
+  .thx-page{max-width:760px;margin:0 auto;padding:clamp(64px,9vw,120px) 24px;text-align:center}
+  .thx-mark{display:grid;place-items:center;width:72px;height:72px;margin:0 auto 28px;border-radius:50%;background:var(--line-green);color:#fff;font-size:36px;line-height:1}
+  .thx-page h1{margin:0 0 16px;color:var(--ink);font-size:clamp(2rem,4.2vw,3.25rem);line-height:1.15;letter-spacing:-.025em}
+  .thx-lead{max-width:60ch;margin:0 auto;color:#384355;font-size:clamp(1.08rem,1.8vw,1.22rem);line-height:1.85}
+  .thx-hours{margin:1rem 0 0;color:var(--muted)}
+
+  .thx-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:32px}
+  .thx-actions a{display:inline-flex;align-items:center;min-height:52px;padding:.75rem 1.4rem;border-radius:10px;text-decoration:none;font-weight:700}
+  /* Green stays reserved for LINE, per the design system's LINE Green Rule. */
+  .thx-line{background:var(--line-green);color:#fff}
+  .thx-line:hover{background:var(--line-green-dark);color:#fff}
+  .thx-call{border:1px solid var(--line);background:#fff;color:var(--ink)}
+  .thx-call:hover{border-color:var(--brand);color:var(--brand)}
+
+  .thx-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 24px;margin-top:44px;padding-top:32px;border-top:1px solid var(--line)}
+  .thx-nav a{color:var(--muted);text-decoration:none}
+  .thx-nav a:hover{color:var(--brand);text-decoration:underline;text-underline-offset:.2em}
+</style>
