@@ -1,0 +1,468 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import footerHtml from '../data/footer.html?raw';
+import { breadcrumbTrail, breadcrumbHtml } from '../lib/content.js';
+
+const title = 'แปลงหน่วยวิศวกรรม ความดัน แรง อัตราการไหล | นิวเมติก ดอทคอม';
+const description =
+  'เครื่องมือแปลงหน่วยวิศวกรรมสำหรับงานโรงงาน ทั้งความดัน (bar, psi, kgf/cm²) แรง (N, kgf, lbf) อัตราการไหล กำลัง อุณหภูมิ ความยาว และแรงบิด พร้อมตารางเทียบหน่วยที่ใช้บ่อย';
+
+/**
+ * Unit data — the single source for BOTH the static reference tables rendered
+ * below and the interactive converter, so the two can never disagree.
+ *
+ * `factor` is how many base units one of this unit is worth. The base of each
+ * category is the unit Thai factory teams actually quote in, not the SI unit:
+ * quoting pressure against bar keeps "1 psi = 0.0689476 bar" readable, where
+ * against the pascal it would read 6894.76 and help nobody.
+ *
+ * Temperature carries offsets rather than a factor, so it is flagged and
+ * handled separately in the table below and in the client script.
+ */
+const CATEGORIES = [
+  {
+    id: 'pressure',
+    name: 'ความดัน',
+    base: 'bar',
+    units: [
+      { sym: 'bar', name: 'บาร์', factor: 1 },
+      { sym: 'psi', name: 'ปอนด์ต่อตารางนิ้ว', factor: 0.0689475729317 },
+      { sym: 'kgf/cm²', name: 'กิโลกรัมแรงต่อตารางเซนติเมตร', factor: 0.980665 },
+      { sym: 'MPa', name: 'เมกะปาสคาล', factor: 10 },
+      { sym: 'kPa', name: 'กิโลปาสคาล', factor: 0.01 },
+      { sym: 'Pa', name: 'ปาสคาล', factor: 0.00001 },
+      { sym: 'mbar', name: 'มิลลิบาร์', factor: 0.001 },
+      { sym: 'atm', name: 'บรรยากาศ', factor: 1.01325 },
+      { sym: 'mmHg', name: 'มิลลิเมตรปรอท', factor: 0.00133322387415 },
+      { sym: 'mmH₂O', name: 'มิลลิเมตรน้ำ', factor: 0.0000980665 },
+    ],
+  },
+  {
+    id: 'force',
+    name: 'แรง',
+    base: 'N',
+    units: [
+      { sym: 'N', name: 'นิวตัน', factor: 1 },
+      { sym: 'kgf', name: 'กิโลกรัมแรง', factor: 9.80665 },
+      { sym: 'kN', name: 'กิโลนิวตัน', factor: 1000 },
+      { sym: 'lbf', name: 'ปอนด์แรง', factor: 4.4482216152605 },
+      { sym: 'tonf', name: 'ตันแรง (เมตริก)', factor: 9806.65 },
+      { sym: 'dyn', name: 'ดายน์', factor: 0.00001 },
+    ],
+  },
+  {
+    id: 'flow',
+    name: 'อัตราการไหล',
+    base: 'L/min',
+    units: [
+      { sym: 'L/min', name: 'ลิตรต่อนาที', factor: 1 },
+      { sym: 'CFM', name: 'ลูกบาศก์ฟุตต่อนาที', factor: 28.316846592 },
+      { sym: 'm³/h', name: 'ลูกบาศก์เมตรต่อชั่วโมง', factor: 16.6666666667 },
+      { sym: 'm³/min', name: 'ลูกบาศก์เมตรต่อนาที', factor: 1000 },
+      { sym: 'L/s', name: 'ลิตรต่อวินาที', factor: 60 },
+      { sym: 'GPM', name: 'แกลลอนสหรัฐต่อนาที', factor: 3.785411784 },
+    ],
+  },
+  {
+    id: 'power',
+    name: 'กำลัง',
+    base: 'kW',
+    units: [
+      { sym: 'kW', name: 'กิโลวัตต์', factor: 1 },
+      { sym: 'HP', name: 'แรงม้า (อังกฤษ)', factor: 0.7456998715823 },
+      { sym: 'PS', name: 'แรงม้า (เมตริก)', factor: 0.73549875 },
+      { sym: 'W', name: 'วัตต์', factor: 0.001 },
+      { sym: 'kcal/h', name: 'กิโลแคลอรีต่อชั่วโมง', factor: 0.001163 },
+      { sym: 'BTU/h', name: 'บีทียูต่อชั่วโมง', factor: 0.00029307107 },
+    ],
+  },
+  {
+    id: 'torque',
+    name: 'แรงบิด',
+    base: 'N·m',
+    units: [
+      { sym: 'N·m', name: 'นิวตันเมตร', factor: 1 },
+      { sym: 'kgf·m', name: 'กิโลกรัมแรงเมตร', factor: 9.80665 },
+      { sym: 'kgf·cm', name: 'กิโลกรัมแรงเซนติเมตร', factor: 0.0980665 },
+      { sym: 'lbf·ft', name: 'ปอนด์แรงฟุต', factor: 1.3558179483314 },
+      { sym: 'lbf·in', name: 'ปอนด์แรงนิ้ว', factor: 0.1129848290276 },
+    ],
+  },
+  {
+    id: 'length',
+    name: 'ความยาว',
+    base: 'mm',
+    units: [
+      { sym: 'mm', name: 'มิลลิเมตร', factor: 1 },
+      { sym: 'cm', name: 'เซนติเมตร', factor: 10 },
+      { sym: 'm', name: 'เมตร', factor: 1000 },
+      { sym: 'inch', name: 'นิ้ว', factor: 25.4 },
+      { sym: 'ft', name: 'ฟุต', factor: 304.8 },
+    ],
+  },
+  {
+    id: 'volume',
+    name: 'ปริมาตร',
+    base: 'L',
+    units: [
+      { sym: 'L', name: 'ลิตร', factor: 1 },
+      { sym: 'm³', name: 'ลูกบาศก์เมตร', factor: 1000 },
+      { sym: 'mL', name: 'มิลลิลิตร', factor: 0.001 },
+      { sym: 'ft³', name: 'ลูกบาศก์ฟุต', factor: 28.316846592 },
+      { sym: 'gal', name: 'แกลลอนสหรัฐ', factor: 3.785411784 },
+    ],
+  },
+  {
+    id: 'temperature',
+    name: 'อุณหภูมิ',
+    base: '°C',
+    temperature: true,
+    units: [
+      { sym: '°C', name: 'องศาเซลเซียส' },
+      { sym: '°F', name: 'องศาฟาเรนไฮต์' },
+      { sym: 'K', name: 'เคลวิน' },
+    ],
+  },
+];
+
+/** Trim a factor to 7 significant digits without turning 1000 into 1. */
+function fmt(n) {
+  if (n === 0) return '0';
+  const abs = Math.abs(n);
+  if (abs < 1e-6 || abs >= 1e9) return n.toExponential(4);
+  let s = n.toPrecision(7);
+  if (s.includes('.')) s = s.replace(/0+$/, '').replace(/\.$/, '');
+  const [whole, dec] = s.split('.');
+  return Number(whole).toLocaleString('en-US') + (dec ? `.${dec}` : '');
+}
+
+/** Fixed reference points, since temperature converts by offset not by ratio. */
+const TEMPERATURE_ROWS = [-40, 0, 20, 40, 100].map((c) => ({
+  c,
+  f: fmt(c * 9 / 5 + 32),
+  k: fmt(c + 273.15),
+}));
+
+const defaultCategory = CATEGORIES[0];
+const trail = breadcrumbTrail('engineer-unit-converter', title);
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical="/engineer-unit-converter/"
+  route="engineer-unit-converter"
+  footerHtml={footerHtml}
+>
+  <article class="converter-page">
+    <Fragment set:html={breadcrumbHtml(trail)} />
+
+    <header class="converter-header">
+      <h1>แปลงหน่วยวิศวกรรม</h1>
+      <p class="converter-lead">
+        แปลงหน่วยที่ใช้บ่อยในงานนิวเมติก ไฮดรอลิค และระบบลมอัด ทั้งความดัน แรง อัตราการไหล
+        กำลัง แรงบิด ความยาว ปริมาตร และอุณหภูมิ ผลลัพธ์คำนวณทันทีในเครื่องของคุณ
+        และมีตารางเทียบหน่วยให้เปิดดูได้โดยไม่ต้องกรอกอะไร
+      </p>
+    </header>
+
+    <section class="converter-tool" aria-labelledby="converter-tool-title">
+      <h2 id="converter-tool-title" class="visually-hidden">เครื่องมือแปลงหน่วย</h2>
+
+      <div class="converter-tabs" role="group" aria-label="เลือกประเภทหน่วย">
+        {CATEGORIES.map((category, index) => (
+          <button
+            type="button"
+            class="converter-tab"
+            data-category={category.id}
+            aria-pressed={index === 0 ? 'true' : 'false'}
+          >{category.name}</button>
+        ))}
+      </div>
+
+      <div class="converter-fields">
+        <p class="converter-field">
+          <label for="converter-from-value">จำนวน</label>
+          <span class="converter-row">
+            <input id="converter-from-value" type="number" inputmode="decimal" value="1" step="any" />
+            <select id="converter-from-unit" aria-label="หน่วยต้นทาง">
+              {defaultCategory.units.map((unit) => (
+                <option value={unit.sym}>{unit.sym} — {unit.name}</option>
+              ))}
+            </select>
+          </span>
+        </p>
+
+        <button type="button" class="converter-swap" id="converter-swap" aria-label="สลับหน่วยต้นทางและปลายทาง">
+          <span aria-hidden="true">⇅</span>
+        </button>
+
+        <p class="converter-field">
+          <label for="converter-to-value">ผลลัพธ์</label>
+          <span class="converter-row">
+            <output id="converter-to-value" for="converter-from-value converter-from-unit converter-to-unit">—</output>
+            <select id="converter-to-unit" aria-label="หน่วยปลายทาง">
+              {defaultCategory.units.map((unit, index) => (
+                <option value={unit.sym} selected={index === 1}>{unit.sym} — {unit.name}</option>
+              ))}
+            </select>
+          </span>
+        </p>
+      </div>
+
+      <p class="converter-summary" id="converter-summary" aria-live="polite"></p>
+      <noscript>
+        <p class="converter-noscript">
+          เครื่องมือแปลงหน่วยต้องใช้ JavaScript — ดูค่าเทียบหน่วยได้จากตารางด้านล่างนี้
+        </p>
+      </noscript>
+    </section>
+
+    <section class="converter-tables" aria-labelledby="converter-tables-title">
+      <h2 id="converter-tables-title">ตารางเทียบหน่วยที่ใช้บ่อย</h2>
+
+      {CATEGORIES.filter((category) => !category.temperature).map((category) => (
+        <div class="converter-table-block">
+          <h3>{category.name}</h3>
+          <div class="converter-table-scroll">
+            <table>
+              <caption class="visually-hidden">ตารางเทียบหน่วย{category.name} เทียบกับ {category.base}</caption>
+              <thead>
+                <tr>
+                  <th scope="col">หน่วย</th>
+                  <th scope="col">ชื่อเต็ม</th>
+                  <th scope="col">ค่าเทียบเท่า</th>
+                </tr>
+              </thead>
+              <tbody>
+                {category.units.map((unit) => (
+                  <tr>
+                    <th scope="row">{unit.sym}</th>
+                    <td>{unit.name}</td>
+                    <td>1 {unit.sym} = {fmt(unit.factor)} {category.base}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ))}
+
+      <div class="converter-table-block">
+        <h3>อุณหภูมิ</h3>
+        <div class="converter-table-scroll">
+          <table>
+            <caption class="visually-hidden">ตารางเทียบอุณหภูมิ องศาเซลเซียส องศาฟาเรนไฮต์ และเคลวิน</caption>
+            <thead>
+              <tr>
+                <th scope="col">°C</th>
+                <th scope="col">°F</th>
+                <th scope="col">K</th>
+              </tr>
+            </thead>
+            <tbody>
+              {TEMPERATURE_ROWS.map((row) => (
+                <tr>
+                  <th scope="row">{row.c}</th>
+                  <td>{row.f}</td>
+                  <td>{row.k}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p class="converter-note">
+          °F = (°C × 9 ÷ 5) + 32 และ K = °C + 273.15 — อุณหภูมิแปลงด้วยการบวกลบค่าคงที่
+          ไม่ใช่การคูณอัตราส่วนเหมือนหน่วยอื่น
+        </p>
+      </div>
+    </section>
+
+    <section class="converter-faq" aria-labelledby="converter-faq-title">
+      <h2 id="converter-faq-title">คำถามที่พบบ่อย</h2>
+
+      <h3>แปลง kg เป็น N ทำอย่างไร</h3>
+      <p>
+        คูณด้วย 9.80665 ซึ่งเป็นค่าความเร่งโน้มถ่วงมาตรฐาน เช่น 10 kgf = 98.0665 N
+        และแปลงกลับด้วยการหารด้วย 9.80665 เช่น 100 N = 10.1972 kgf
+        ข้อควรระวังคือ kg เป็นหน่วยมวล ส่วน kgf (กิโลกรัมแรง) เป็นหน่วยแรง
+        การแปลงนี้ใช้ได้เมื่อพูดถึงน้ำหนักที่กระทำภายใต้แรงโน้มถ่วงปกติ
+      </p>
+
+      <h3>1 bar เท่ากับกี่ psi</h3>
+      <p>
+        1 bar = 14.50377 psi และ 1 psi = 0.0689476 bar
+        เกจวัดความดันลมในโรงงานไทยส่วนใหญ่อ่านเป็น bar หรือ kgf/cm²
+        ส่วนสเปกอุปกรณ์จากอเมริกามักระบุเป็น psi
+      </p>
+
+      <h3>kgf/cm² กับ bar ต่างกันอย่างไร</h3>
+      <p>
+        1 kgf/cm² = 0.980665 bar ต่างกันประมาณ 2% เท่านั้น
+        ในงานหน้างานจึงมักใช้แทนกันได้โดยประมาณ
+        แต่ถ้าเป็นการตั้งค่าเซฟตี้วาล์วหรือคำนวณตามสเปกควรใช้ค่าจริง
+      </p>
+
+      <h3>CFM กับ L/min แปลงกันอย่างไร</h3>
+      <p>
+        1 CFM = 28.3168 L/min และ 1 L/min = 0.0353147 CFM
+        ใช้บ่อยตอนเทียบสเปกเครื่องอัดลมที่ระบุเป็น CFM
+        กับความต้องการลมของอุปกรณ์ที่ระบุเป็น L/min
+      </p>
+    </section>
+
+    <section class="converter-related" aria-labelledby="converter-related-title">
+      <h2 id="converter-related-title">อ่านต่อ</h2>
+      <ul>
+        <li><a href="/air-compressor/">เครื่องอัดอากาศ หรือเครื่องอัดลม มีกี่ประเภท</a> — วิธีคำนวณอัตราการผลิตลมอัดให้พอกับโรงงาน</li>
+        <li><a href="/aftercoolers-factory/">Aftercooler คืออะไร</a> — วิธีคำนวณอุณหภูมิลมขาออกหลังระบายความร้อน</li>
+        <li><a href="/pneumatic/">อุปกรณ์นิวเมติกส์</a> — กระบอกลม วาล์ว ข้อต่อลม และชุดปรับปรุงคุณภาพลม</li>
+        <li><a href="/hydraulic/">อุปกรณ์ไฮดรอลิค</a> — ปั๊ม วาล์ว และกระบอกไฮดรอลิค</li>
+      </ul>
+    </section>
+  </article>
+</BaseLayout>
+
+<style>
+  .converter-page{padding-bottom:clamp(4.5rem,8vw,7rem);background:linear-gradient(180deg,var(--wash) 0,rgba(243,246,251,.52) 320px,#fff 320px)}
+  .converter-page>*:not(.breadcrumb){width:min(900px,calc(100% - 48px));margin-inline:auto}
+
+  .converter-header{padding:clamp(1.5rem,3vw,2.25rem) 0 clamp(1.75rem,3.5vw,2.5rem)}
+  .converter-header h1{margin:0;color:var(--ink);font-size:clamp(2.5rem,4.2vw,3.75rem);line-height:1.12;letter-spacing:-.025em}
+  .converter-lead{max-width:72ch;margin:1rem 0 0;color:#384355;font-size:clamp(1.08rem,1.8vw,1.22rem);line-height:1.85}
+
+  .converter-tool{padding:clamp(1.5rem,3vw,2.25rem);border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 18px 50px rgba(23,48,92,.08)}
+
+  .converter-tabs{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.5rem}
+  .converter-tab{min-height:44px;padding:.55rem 1rem;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--muted);font:inherit;font-size:16px;font-weight:600;line-height:1.15;cursor:pointer}
+  .converter-tab:hover{border-color:var(--brand);color:var(--brand)}
+  .converter-tab[aria-pressed="true"]{border-color:var(--brand);background:var(--brand);color:#fff}
+
+  .converter-fields{display:grid;grid-template-columns:1fr auto 1fr;align-items:end;gap:1rem}
+  .converter-field{margin:0;min-width:0}
+  .converter-field label{display:block;margin-bottom:.4rem;color:var(--muted);font-size:16px;font-weight:600}
+  .converter-row{display:flex;gap:.5rem;min-width:0}
+  .converter-row>*{min-width:0}
+
+  .converter-fields input,.converter-fields select,.converter-fields output{min-height:52px;padding:.6rem .75rem;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);font:inherit;font-size:1.08rem}
+  .converter-fields input{flex:1 1 40%;width:100%}
+  .converter-fields select{flex:1 1 60%;padding-right:2rem}
+  .converter-fields output{display:flex;flex:1 1 40%;align-items:center;background:var(--wash);font-weight:700;overflow-x:auto}
+
+  .converter-swap{display:flex;align-items:center;justify-content:center;width:52px;height:52px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--brand);font-size:1.5rem;line-height:1;cursor:pointer}
+  .converter-swap:hover{border-color:var(--brand);background:var(--brand);color:#fff}
+
+  .converter-summary{margin:1.25rem 0 0;color:var(--muted);font-size:1.05rem}
+  .converter-summary:empty{display:none}
+  .converter-noscript{margin:1.25rem 0 0;color:var(--muted)}
+
+  .converter-tables,.converter-faq,.converter-related{padding-top:clamp(2.5rem,5vw,4rem)}
+  .converter-tables h2,.converter-faq h2,.converter-related h2{margin:0 0 .5rem;color:var(--ink);font-size:clamp(1.55rem,2.6vw,2rem);line-height:1.25}
+  .converter-table-block{margin-top:clamp(1.75rem,3vw,2.5rem)}
+  .converter-table-block h3{margin:0 0 .65rem;font-size:1.25rem}
+
+  .converter-table-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:14px}
+  .converter-tables table{width:100%;border-collapse:collapse;font-size:1rem}
+  .converter-tables th,.converter-tables td{padding:.75rem;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+  .converter-tables thead th{background:var(--wash);font-size:16px}
+  .converter-tables tbody tr:last-child th,.converter-tables tbody tr:last-child td{border-bottom:0}
+  .converter-tables tbody th{font-weight:700}
+  .converter-note{margin:.85rem 0 0;color:var(--muted);font-size:1rem;line-height:1.75}
+
+  .converter-faq h3{margin:clamp(1.5rem,3vw,2rem) 0 .5rem;font-size:1.25rem}
+  .converter-faq p{margin:0;max-width:72ch;line-height:1.85}
+
+  .converter-related ul{margin:1rem 0 0;padding-left:1.5rem}
+  .converter-related li{margin:.5rem 0;padding-left:.3rem;line-height:1.75}
+  .converter-related li::marker{color:var(--brand)}
+
+  .visually-hidden{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;clip-path:inset(50%);overflow:hidden;white-space:nowrap}
+
+  @media(max-width:760px){
+    .converter-page>*:not(.breadcrumb){width:calc(100% - 36px)}
+    .converter-fields{grid-template-columns:1fr;align-items:stretch}
+    .converter-swap{justify-self:start;transform:rotate(90deg)}
+  }
+</style>
+
+<script is:inline define:vars={{ CATEGORIES }}>
+  (() => {
+    const byId = Object.fromEntries(CATEGORIES.map((c) => [c.id, c]));
+    const tabs = [...document.querySelectorAll('.converter-tab')];
+    const fromValue = document.getElementById('converter-from-value');
+    const fromUnit = document.getElementById('converter-from-unit');
+    const toUnit = document.getElementById('converter-to-unit');
+    const toValue = document.getElementById('converter-to-value');
+    const summary = document.getElementById('converter-summary');
+    let active = CATEGORIES[0];
+
+    // Same rounding as the server-rendered tables, so a value read off a table
+    // and a value produced by the tool always look alike.
+    const fmt = (n) => {
+      if (!isFinite(n)) return '—';
+      if (n === 0) return '0';
+      const abs = Math.abs(n);
+      if (abs < 1e-6 || abs >= 1e9) return n.toExponential(4);
+      let s = n.toPrecision(7);
+      if (s.includes('.')) s = s.replace(/0+$/, '').replace(/\.$/, '');
+      const [whole, dec] = s.split('.');
+      return Number(whole).toLocaleString('en-US') + (dec ? '.' + dec : '');
+    };
+
+    const toCelsius = (v, sym) => (sym === '°F' ? (v - 32) * 5 / 9 : sym === 'K' ? v - 273.15 : v);
+    const fromCelsius = (c, sym) => (sym === '°F' ? c * 9 / 5 + 32 : sym === 'K' ? c + 273.15 : c);
+
+    const convert = (value, from, to) => {
+      if (active.temperature) return fromCelsius(toCelsius(value, from), to);
+      const unit = (sym) => active.units.find((u) => u.sym === sym);
+      return (value * unit(from).factor) / unit(to).factor;
+    };
+
+    const fill = (select, selectedIndex) => {
+      select.replaceChildren(
+        ...active.units.map((unit) => {
+          const option = document.createElement('option');
+          option.value = unit.sym;
+          option.textContent = unit.sym + ' — ' + unit.name;
+          return option;
+        }),
+      );
+      select.selectedIndex = Math.min(selectedIndex, active.units.length - 1);
+    };
+
+    const update = () => {
+      const value = parseFloat(fromValue.value);
+      if (Number.isNaN(value)) {
+        toValue.textContent = '—';
+        summary.textContent = '';
+        return;
+      }
+      const result = convert(value, fromUnit.value, toUnit.value);
+      toValue.textContent = fmt(result);
+      summary.textContent =
+        fmt(value) + ' ' + fromUnit.value + ' = ' + fmt(result) + ' ' + toUnit.value;
+    };
+
+    for (const tab of tabs) {
+      tab.addEventListener('click', () => {
+        active = byId[tab.dataset.category];
+        for (const other of tabs) other.setAttribute('aria-pressed', String(other === tab));
+        fill(fromUnit, 0);
+        fill(toUnit, 1);
+        update();
+      });
+    }
+
+    document.getElementById('converter-swap').addEventListener('click', () => {
+      const from = fromUnit.value;
+      fromUnit.value = toUnit.value;
+      toUnit.value = from;
+      update();
+    });
+
+    fromValue.addEventListener('input', update);
+    fromUnit.addEventListener('change', update);
+    toUnit.addEventListener('change', update);
+    update();
+  })();
+</script>
