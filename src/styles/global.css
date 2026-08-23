@@ -174,13 +174,20 @@ a:hover{color:var(--brand-dark)}
 .about-landing .about-verification-links{display:flex;align-items:center;gap:24px;margin-top:24px}
 .about-landing .about-verification-links a{display:grid;min-width:72px;min-height:52px;place-items:center;border-radius:12px;background:#fff;transition:transform .2s ease}
 
-/* Quote-request form, appended after the full-bleed gallery as the last child
-   of .legacy-content — outside .about-landing, so none of the two-column grid
-   rules above reach it. The embed sizes itself to the container. */
-.about-form{width:min(760px,calc(100% - 48px));margin:0 auto;padding:clamp(3.5rem,7vw,6rem) 0}
+/* Map and quote-request form, appended after the full-bleed gallery as the
+   last children of .legacy-content — outside .about-landing, so none of the
+   two-column grid rules above reach them. The form embed sizes itself to the
+   container; the map iframe carries a 600x450 attribute pair that has to be
+   overridden or it renders fixed-width and overflows on a phone. */
+.about-map,.about-form{width:min(760px,calc(100% - 48px));margin:0 auto}
+.about-map{padding:clamp(3.5rem,7vw,6rem) 0 0}
+.about-form{padding:clamp(3.5rem,7vw,6rem) 0}
+.about-map h2{margin:0 0 .65rem;color:var(--ink);font-size:clamp(1.65rem,3vw,2.4rem);line-height:1.25}
+.about-map>p{max-width:72ch;margin:0 0 clamp(1.25rem,2.5vw,1.75rem);color:var(--muted);line-height:1.85}
+.about-map iframe{display:block;width:100%;height:clamp(300px,42vw,420px);border-radius:var(--radius)}
 .about-form h2{margin:0 0 .65rem;color:var(--ink);font-size:clamp(1.65rem,3vw,2.4rem);line-height:1.25}
 .about-form>p{max-width:72ch;margin:0 0 clamp(1.5rem,3vw,2.25rem);color:var(--muted);line-height:1.85}
-@media(max-width:860px){.about-form{width:calc(100% - 36px)}}
+@media(max-width:860px){.about-map,.about-form{width:calc(100% - 36px)}}
 .about-landing .about-verification-links a:hover{transform:translateY(-2px)}
 .about-landing .about-verification-links a:first-child img{width:64px;height:64px}
 .about-landing .about-verification-links a:last-child img{width:min(210px,100%);height:auto}

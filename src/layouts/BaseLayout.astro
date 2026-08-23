@@ -147,6 +147,11 @@ const structuredData = { '@context': 'https://schema.org', '@graph': graph };
 <!doctype html>
 <html lang="th">
   <head>
+    <!-- charset first: the HTML spec wants it inside the first 1024 bytes and
+         ahead of any script. This site is entirely Thai, so a browser left to
+         guess the encoding garbles the whole page. -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!-- Google Tag Manager -->
     <script is:inline>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -154,8 +159,6 @@ const structuredData = { '@context': 'https://schema.org', '@graph': graph };
     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-MTKXPDHV');</script>
     <!-- End Google Tag Manager -->
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="preconnect" href="https://www.googletagmanager.com" />
     <link rel="preload" href="/fonts/maledpan-regular-webfont.woff2" as="font" type="font/woff2" crossorigin />
     {ogImage?.startsWith('/') && <link rel="preload" href={ogImage} as="image" fetchpriority="high" imagesrcset={heroSrcset} imagesizes={heroSizes} />}
