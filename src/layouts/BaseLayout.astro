@@ -1,7 +1,7 @@
 ---
 import '../styles/global.css';
 import { breadcrumbTrail } from '../lib/content.js';
-const { title, description = '', canonical = '/', isHome = false, footerHtml = '', ogImage, route = '', noindex = false, hasVideo = false, heroSrcset, heroSizes, faq = [] } = Astro.props;
+const { title, description = '', canonical = '/', isHome = false, footerHtml = '', ogImage, route = '', noindex = false, hasVideo = false, heroSrcset, heroSizes, faq = [], lastmod, datePublished } = Astro.props;
 const lineHref = 'https://lin.ee/UCQRpej';
 const mapHref = 'https://goo.gl/maps/hwugnzhLCh92';
 const siteUrl = new URL('https://pneumaticth.com');
@@ -92,7 +92,21 @@ const graph = [
     isPartOf: { '@id': websiteId },
     about: { '@id': organizationId },
     primaryImageOfPage: { '@type': 'ImageObject', url: socialImageUrl },
-    ...(articleRoutes.has(route) ? { author: { '@id': organizationId }, publisher: { '@id': organizationId } } : {}),
+    // An Article with no dates reads as undated to both Google and answer
+    // engines, and technical articles that look undated look stale. dateModified
+    // is the page's own lastmod, which pages.json already keeps accurate per the
+    // convention in astro.config.mjs. datePublished is only emitted when a real
+    // date is recorded — the original WordPress dates did not survive the
+    // migration, and a guessed publication date is a fabricated fact.
+    ...(articleRoutes.has(route)
+      ? {
+          author: { '@id': organizationId },
+          publisher: { '@id': organizationId },
+          image: socialImageUrl,
+          ...(datePublished ? { datePublished } : {}),
+          ...(lastmod ? { dateModified: lastmod } : {}),
+        }
+      : {}),
   },
   ...(services[route] ? [{
     '@type': 'Service',

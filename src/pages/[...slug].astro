@@ -53,6 +53,8 @@ const heroSizes = heroTag.match(/\ssizes="([^"]+)"/)?.[1];
   heroSizes={heroSizes}
   route={page.route || ''}
   faq={page.faq}
+  lastmod={page.lastmod}
+  datePublished={page.datePublished}
   hasVideo={hasYoutube(pageHtml)}
 >
   <article class="legacy-content" set:html={pageHtml} />
