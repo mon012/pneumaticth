@@ -37,7 +37,7 @@ a:hover{color:var(--brand-dark)}
 .menu-toggle{display:none}
 
 /* Breadcrumbs — sits between the page hero and the page body */
-.breadcrumb{width:min(var(--container),100%);margin:0 auto;padding:1.1rem max(24px,calc((100vw - var(--container))/2)) 0}
+.breadcrumb{width:100%;margin:0 auto;padding:1.1rem max(24px,calc((100vw - var(--container))/2)) 0}
 .breadcrumb ol{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin:0;padding:0;list-style:none;color:var(--muted);font-size:16px;line-height:1.5}
 .breadcrumb li{display:flex;align-items:center;gap:.5rem;min-width:0}
 .breadcrumb li+li::before{content:"›";color:var(--line);font-size:1.15em}
@@ -88,7 +88,7 @@ a:hover{color:var(--brand-dark)}
 .site-footer h4{margin:0 0 1.15rem;color:#fff;font-size:20px!important;font-weight:750}
 .site-footer p{display:flex;align-items:flex-start;gap:.65rem;max-width:32ch;margin:.48rem 0;color:#bfc9da;line-height:1.65}
 .site-footer p:not(.gb-headline){font-size:16px!important}
-.site-footer p.gb-headline{font-size:18px}
+.site-footer p.gb-headline{font-size:16px}
 .site-footer p:first-of-type{margin-top:0}
 .site-footer .gb-icon{display:inline-grid;flex:0 0 1rem;place-items:center;width:1rem;height:1.65em;color:#78a4ff}
 .site-footer a:hover{color:#8fb2ff}
@@ -174,20 +174,38 @@ a:hover{color:var(--brand-dark)}
 .about-landing .about-verification-links{display:flex;align-items:center;gap:24px;margin-top:24px}
 .about-landing .about-verification-links a{display:grid;min-width:72px;min-height:52px;place-items:center;border-radius:12px;background:#fff;transition:transform .2s ease}
 
-/* Map and quote-request form, appended after the full-bleed gallery as the
-   last children of .legacy-content — outside .about-landing, so none of the
-   two-column grid rules above reach them. The form embed sizes itself to the
-   container; the map iframe carries a 600x450 attribute pair that has to be
-   overridden or it renders fixed-width and overflows on a phone. */
-.about-map,.about-form{width:min(760px,calc(100% - 48px));margin:0 auto}
-.about-map{padding:clamp(3.5rem,7vw,6rem) 0 0}
-.about-form{padding:clamp(3.5rem,7vw,6rem) 0}
+/* Map and quote-request form live inside the first row's main column, under
+   the lead copy, so the tall contact card beside them no longer leaves a hole.
+   The form embed sizes itself to the container; the map iframe carries a
+   600x450 attribute pair that has to be overridden or it renders fixed-width
+   and overflows on a phone. */
+.about-map,.about-form{width:100%;margin:0}
+.about-map{padding:clamp(2rem,4vw,3rem) 0 0}
+.about-form{padding:clamp(2rem,4vw,3rem) 0 0}
 .about-map h2{margin:0 0 .65rem;color:var(--ink);font-size:clamp(1.65rem,3vw,2.4rem);line-height:1.25}
 .about-map>p{max-width:72ch;margin:0 0 clamp(1.25rem,2.5vw,1.75rem);color:var(--muted);line-height:1.85}
 .about-map iframe{display:block;width:100%;height:clamp(300px,42vw,420px);border-radius:var(--radius)}
 .about-form h2{margin:0 0 .65rem;color:var(--ink);font-size:clamp(1.65rem,3vw,2.4rem);line-height:1.25}
 .about-form>p{max-width:72ch;margin:0 0 clamp(1.5rem,3vw,2.25rem);color:var(--muted);line-height:1.85}
-@media(max-width:860px){.about-map,.about-form{width:calc(100% - 36px)}}
+
+/* Office/works gallery: the closing full-bleed section of the contact page,
+   below the map and form. It sits outside .about-landing like those two, so it
+   carries its own grid instead of inheriting the two-column shell rules. */
+.about-proof{width:100%;padding:clamp(3.5rem,6vw,5.5rem) max(24px,calc((100vw - var(--container))/2));background:var(--wash)}
+.about-proof-title{margin:0;color:var(--ink);font-size:clamp(1.75rem,3vw,2.5rem);line-height:1.25}
+.about-proof-note{margin:.35rem 0 2rem;color:var(--muted)}
+.about-proof .wp-block-gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:240px;gap:12px;margin:0}
+.about-proof .wp-block-image{width:auto;margin:0;overflow:hidden;border-radius:12px;background:#e8edf5}
+.about-proof .wp-block-image:first-child{grid-column:span 2;grid-row:span 2}
+.about-proof .wp-block-image img{width:100%;height:100%;border-radius:0;object-fit:cover;transition:transform .25s ease}
+.about-proof .wp-block-image:hover img{transform:scale(1.025)}
+.about-proof .about-more-work{margin:2rem 0 0}
+.about-proof .about-more-work a{display:inline-flex;align-items:center;min-height:46px;padding:.65rem 1rem;border-radius:10px;background:var(--brand);color:#fff;text-decoration:none;font-weight:700}
+.about-proof .about-more-work a:hover{background:var(--brand-dark)}
+@media(max-width:860px){.about-proof{padding:3.5rem 18px}}
+@media(max-width:860px){.about-proof .wp-block-gallery{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:220px}}
+@media(max-width:560px){.about-proof .wp-block-gallery{grid-template-columns:1fr;grid-auto-rows:270px}}
+@media(max-width:560px){.about-proof .wp-block-image:first-child{grid-column:auto;grid-row:auto}}
 .about-landing .about-verification-links a:hover{transform:translateY(-2px)}
 .about-landing .about-verification-links a:first-child img{width:64px;height:64px}
 .about-landing .about-verification-links a:last-child img{width:min(210px,100%);height:auto}
@@ -214,6 +232,9 @@ a:hover{color:var(--brand-dark)}
 .legacy-content:has(.privacy-landing){background:linear-gradient(180deg,var(--wash) 0,rgba(243,246,251,.52) 260px,#fff 260px)}
 .legacy-content:has(.privacy-landing)>.page-header{display:block;width:min(900px,calc(100% - 48px));margin:0 auto;padding:clamp(3.75rem,8vw,6.5rem) 0 clamp(2rem,4vw,3.25rem);text-align:left}
 .legacy-content:has(.privacy-landing)>.page-header h1{margin:0;color:var(--ink);font-size:clamp(2.5rem,4.2vw,3.75rem);line-height:1.12;letter-spacing:-.025em;overflow-wrap:anywhere}
+/* The privacy page runs on its own 900px column, so the site-wide breadcrumb
+   padding would leave it hanging outside the heading it belongs to. */
+.legacy-content:has(.privacy-landing)>.breadcrumb{width:min(900px,calc(100% - 48px));margin:0 auto;padding-inline:0}
 .privacy-landing{max-width:none!important;padding:0 24px clamp(4.5rem,8vw,7rem)!important}
 .privacy-landing .privacy-shell{width:min(900px,100%);margin:0 auto;padding:clamp(2rem,4vw,3.5rem);border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 18px 50px rgba(23,48,92,.08)}
 .privacy-landing .privacy-shell>.gb-grid-wrapper{display:block}
@@ -276,6 +297,13 @@ a:hover{color:var(--brand-dark)}
 .blog-landing .blog-intro{max-width:70ch;margin:0 0 clamp(2rem,4vw,3rem);color:var(--muted);font-size:clamp(1.05rem,1.6vw,1.2rem)}
 .blog-landing .blog-card .entry-excerpt{margin:0 0 1.25rem;color:var(--muted);font-size:1.05rem;line-height:1.6}
 .blog-landing .blog-card .entry-more{margin-top:auto}
+/* Unit-converter tool sitting in the article grid: same card, but a flat
+   icon tile stands in for the photo the other cards carry. */
+.blog-landing .blog-card .blog-tool-pic{display:grid;place-items:center;background:linear-gradient(135deg,var(--brand),#12306b)}
+.blog-landing .blog-card .blog-tool-pic a{display:grid;place-items:center}
+.blog-landing .blog-card .blog-tool-pic svg{width:76px;height:76px;color:#fff}
+.blog-landing .blog-tool-card:hover .blog-tool-pic svg{transform:none}
+.blog-landing .blog-tool-eyebrow{margin:0 0 .5rem;color:var(--brand);font-size:.85rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
 .blog-landing .blog-card .btn-readmore{display:inline-flex;min-height:44px;align-items:center;color:var(--brand);font-weight:700;text-underline-offset:.25em}
 .blog-landing .s-paging{margin-top:2.5rem}
 .blog-landing+.site-footer{margin-top:0}
@@ -406,7 +434,7 @@ a{color:var(--brand);text-underline-offset:.2em}
 @media(max-width:860px){.site-footer .footer-widgets{padding:3rem 22px}}
 @media(max-width:860px){.site-footer .gb-grid-wrapper{gap:2.25rem}}
 @media(max-width:860px){.site-footer .footer-bar{padding:1.2rem 22px}}
-@media(max-width:860px){.site-footer .footer-bar .s-container>div{align-items:flex-start;flex-direction:column}}
+@media(max-width:860px){.site-footer .footer-bar .s-container>div{align-items:center;flex-direction:column;text-align:center}}
 @media(max-width:860px){.wp-block-cover__inner-container{padding-inline:18px;max-width:100vw}}
 @media(max-width:860px){.wp-block-cover p{font-size:1rem}}
 @media(max-width:860px){.alignwide{width:100%}}
@@ -422,12 +450,12 @@ a{color:var(--brand);text-underline-offset:.2em}
 @media(max-width:860px){.product-brand-accordion{margin-bottom:2rem}}
 
 /* About page (continued) */
-.about-landing .about-shell{padding-bottom:clamp(3rem,6vw,5rem)}
+.about-landing .about-shell{padding-bottom:clamp(2.5rem,5vw,4rem)}
 .about-landing .about-content{grid-template-columns:minmax(0,1.12fr) minmax(340px,.88fr)}
 .about-landing .about-contact-card{grid-column:2;grid-row:1;align-self:start}
 
 /* Responsive: 860px and below (continued) */
-@media(max-width:860px){.about-landing .about-shell{padding-bottom:3.5rem}}
+@media(max-width:860px){.about-landing .about-shell{padding-bottom:2.5rem}}
 @media(max-width:860px){.about-landing .about-content{grid-template-columns:1fr}}
 @media(max-width:860px){.about-landing .about-main-column,.about-landing .about-contact-card{grid-column:1;grid-row:auto}}
 
@@ -457,6 +485,7 @@ a{color:var(--brand);text-underline-offset:.2em}
 /* Responsive: 600px and below */
 @media(max-width:600px){.legacy-content:has(.privacy-landing)>.page-header{width:calc(100% - 36px);padding:3rem 0 1.75rem}}
 @media(max-width:600px){.legacy-content:has(.privacy-landing)>.page-header h1{font-size:clamp(2rem,11vw,2.65rem)}}
+@media(max-width:600px){.legacy-content:has(.privacy-landing)>.breadcrumb{width:calc(100% - 36px)}}
 @media(max-width:600px){.privacy-landing{padding:0 12px 4rem!important}}
 @media(max-width:600px){.privacy-landing .privacy-shell{padding:1.5rem 18px!important;border-radius:14px!important}}
 @media(max-width:600px){.privacy-landing .privacy-content>p:first-child{font-size:1.05rem}}
@@ -466,6 +495,9 @@ a{color:var(--brand);text-underline-offset:.2em}
 .legacy-content>.page-content{max-width:var(--container);margin-inline:auto;padding:clamp(2.5rem,5vw,5rem) 24px}
 .home .legacy-content>.page-content{max-width:none;padding:0}
 .legacy-content :is(h1,h2,h3,h4){line-height:1.25;text-wrap:balance;margin-top:2.2em;margin-bottom:.65em}
+/* The map/form/gallery sections own their vertical rhythm through section
+   padding, so the heading rhythm above must not stack on top of it. */
+.legacy-content :is(.about-map,.about-form,.about-proof)>h2{margin-top:0}
 .legacy-content h1{font-size:clamp(2.15rem,5vw,4.8rem);letter-spacing:-.025em}
 
 /* WordPress block primitives (cover, grid, banner, embed) (continued) */
