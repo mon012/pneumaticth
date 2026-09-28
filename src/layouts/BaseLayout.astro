@@ -1,7 +1,7 @@
 ---
 import '../styles/global.css';
 import { breadcrumbTrail } from '../lib/content.js';
-const { title, description = '', canonical = '/', isHome = false, footerHtml = '', ogImage, route = '', noindex = false, hasVideo = false, heroSrcset, heroSizes, faq = [], lastmod, datePublished } = Astro.props;
+const { title, description = '', canonical = '/', isHome = false, footerHtml = '', ogImage, route = '', noindex = false, hasVideo = false, heroSrcset, heroSizes, faq = [], lastmod, datePublished, breadcrumbName } = Astro.props;
 const lineHref = 'https://lin.ee/UCQRpej';
 const mapHref = 'https://goo.gl/maps/hwugnzhLCh92';
 const siteUrl = new URL('https://pneumaticth.com');
@@ -15,7 +15,7 @@ const articleRoutes = new Set(['aftercoolers-factory', 'air-compressor', 'hydrau
 const collectionRoutes = new Set(['blog']);
 const pageType = isHome ? 'WebPage' : articleRoutes.has(route) ? 'Article' : collectionRoutes.has(route) ? 'CollectionPage' : route === 'about' ? 'AboutPage' : route === 'privacy' ? 'WebPage' : 'WebPage';
 // Same trail the visible <nav> is built from, so schema and page always agree.
-const trail = breadcrumbTrail(route, title);
+const trail = breadcrumbTrail(route, breadcrumbName ?? title);
 const organizationId = `${siteUrl.href}#organization`;
 const websiteId = `${siteUrl.href}#website`;
 const pageId = `${canonicalUrl}#webpage`;

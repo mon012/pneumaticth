@@ -32,6 +32,7 @@ const CATEGORIES = [
       { sym: 'psi', name: 'ปอนด์ต่อตารางนิ้ว', factor: 0.0689475729317 },
       { sym: 'kgf/cm²', name: 'กิโลกรัมแรงต่อตารางเซนติเมตร', factor: 0.980665 },
       { sym: 'MPa', name: 'เมกะปาสคาล', factor: 10 },
+      { sym: 'N/mm²', name: 'นิวตันต่อตารางมิลลิเมตร (= MPa)', factor: 10 },
       { sym: 'kPa', name: 'กิโลปาสคาล', factor: 0.01 },
       { sym: 'Pa', name: 'ปาสคาล', factor: 0.00001 },
       { sym: 'mbar', name: 'มิลลิบาร์', factor: 0.001 },
@@ -161,10 +162,13 @@ const convertFixed = (categoryId, value, from, to) =>
 
 const QUICK_ANSWERS = [
   { id: 'mpa-bar', title: 'MPa เป็น bar', category: 'pressure', from: 'MPa', to: 'bar', values: [0.1, 0.2, 0.5, 0.7, 1, 1.6, 10, 20] },
+  { id: 'nmm2-kgfcm2', title: 'N/mm² เป็น kgf/cm²', category: 'pressure', from: 'N/mm²', to: 'kgf/cm²', values: [1, 5, 10, 20, 30] },
   { id: 'bar-psi', title: 'bar เป็น psi', category: 'pressure', from: 'bar', to: 'psi', values: [1, 4, 6, 7, 8, 10] },
   { id: 'n-kgf', title: 'N (นิวตัน) เป็น kg (kgf)', category: 'force', from: 'N', to: 'kgf', values: [1, 10, 100, 500, 1000] },
   { id: 'ls-cfm', title: 'L/s เป็น CFM', category: 'flow', from: 'L/s', to: 'CFM', values: [1, 5, 10, 50, 100] },
   { id: 'm3h-cfm', title: 'm³/h เป็น CFM', category: 'flow', from: 'm³/h', to: 'CFM', values: [1, 10, 60, 100, 500] },
+  { id: 'cfm-m3min', title: 'CFM เป็น m³/min', category: 'flow', from: 'CFM', to: 'm³/min', values: [1, 10, 50, 100, 500] },
+  { id: 'cfm-m3h', title: 'CFM เป็น m³/h (CMH)', category: 'flow', from: 'CFM', to: 'm³/h', values: [1, 10, 100, 500, 1000] },
   { id: 'gpm-lmin', title: 'GPM เป็น L/min (ลิตร)', category: 'flow', from: 'GPM', to: 'L/min', values: [1, 5, 10, 50] },
 ].map((q) => ({ ...q, rows: q.values.map((v) => [fmt(v), fmt(convertFixed(q.category, v, q.from, q.to))]) }));
 
@@ -188,6 +192,30 @@ const FAQ = [
   {
     q: 'แปลง m³/h เป็น CFM ทำอย่างไร',
     a: 'คูณด้วย 0.5886 เช่น 100 m³/h = 58.86 CFM และ 1 CFM = 1.699 m³/h',
+  },
+  {
+    q: '1 CFM เท่ากับกี่ m³/min',
+    a: '1 CFM = 0.02832 m³/min และ 1 m³/min = 35.31 CFM เช่น เครื่องอัดลมขนาด 100 CFM ผลิตลมได้ประมาณ 2.83 m³/min',
+  },
+  {
+    q: '1 CFM เท่ากับกี่ CMH (m³/h)',
+    a: '1 CFM = 1.699 m³/h (CMH) และ 1 m³/h = 0.5886 CFM หน่วย CMH ใช้บ่อยในงานระบบระบายอากาศและพัดลม',
+  },
+  {
+    q: 'สูตรคำนวณ CFM คืออะไร',
+    a: 'CFM คือปริมาตรลมเป็นลูกบาศก์ฟุตต่อนาที แปลงจากหน่วยอื่นได้ดังนี้ CFM = L/s × 2.119, CFM = m³/min × 35.31, CFM = m³/h × 0.5886 และ CFM = L/min × 0.03531 ถ้าจะคำนวณความต้องการลมของโรงงาน ให้รวมอัตราลมของอุปกรณ์ทุกตัวที่ทำงานพร้อมกัน แล้วเผื่อเพิ่มราว 20–30% สำหรับลมรั่วและการขยายไลน์',
+  },
+  {
+    q: 'CFM, SCFM และ FAD ต่างกันอย่างไร',
+    a: 'CFM คือปริมาตรลมที่สภาวะจริง ณ จุดวัด SCFM คือปริมาตรที่ปรับเป็นสภาวะมาตรฐาน (ความดัน อุณหภูมิ และความชื้นที่กำหนด) ส่วน FAD (Free Air Delivery) คือปริมาณลมที่เครื่องอัดลมส่งออกได้จริง คิดกลับเป็นสภาวะอากาศขาเข้าตามมาตรฐาน ISO 1217 เวลาเทียบสเปกเครื่องอัดลมต่างยี่ห้อ ควรเทียบค่า FAD ที่ความดันเดียวกัน ไม่ใช่ค่าปริมาตรกระบอกสูบ (Displacement) ซึ่งสูงกว่าลมที่ได้จริง',
+  },
+  {
+    q: 'N คือหน่วยอะไร',
+    a: 'N (นิวตัน) คือหน่วยของแรงในระบบ SI หมายถึงแรงที่ทำให้มวล 1 กิโลกรัมมีความเร่ง 1 เมตรต่อวินาทีกำลังสอง ของที่มีมวล 1 kg บนโลกจะมีน้ำหนักประมาณ 9.81 N หรือเท่ากับ 1 kgf',
+  },
+  {
+    q: 'แปลง N/mm² เป็น kgf/cm² ทำอย่างไร',
+    a: '1 N/mm² = 1 MPa = 10.197 kgf/cm² ดังนั้นให้คูณด้วย 10.197 เช่น 25 N/mm² = 254.9 kgf/cm² หน่วย N/mm² ใช้บ่อยกับกำลังรับแรงของวัสดุและคอนกรีต',
   },
   {
     q: '1 GPM เท่ากับกี่ลิตร',
@@ -218,6 +246,7 @@ const trail = breadcrumbTrail('engineer-unit-converter', 'แปลงหน่�
   route="engineer-unit-converter"
   footerHtml={footerHtml}
   faq={FAQ}
+  breadcrumbName="แปลงหน่วยวิศวกรรม"
 >
   <article class="converter-page">
     <Fragment set:html={breadcrumbHtml(trail)} />
