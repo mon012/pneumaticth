@@ -72,6 +72,11 @@
 /product-category/pneumatic/  /pneumatic/  301
 /product-category/pump/       /hydraulic/  301
 /product-category/hydraulic/  /hydraulic/  301
+/product-category/air-cylinder/    /pneumatic/  301
+/product-category/solenoid-valve/  /pneumatic/  301
+/product-category/vacuum-pad/      /pneumatic/  301
+/product-category/nipple/          /pneumatic/  301
+/product-category/linear/          /pneumatic/  301
 
 # ---------------------------------------------------------------------------
 # 5. Paginated category archives (/product-category/filter/page/3/)
@@ -89,6 +94,11 @@
 /product-category/pneumatic/*  /pneumatic/  301
 /product-category/pump/*       /hydraulic/  301
 /product-category/hydraulic/*  /hydraulic/  301
+/product-category/air-cylinder/*    /pneumatic/  301
+/product-category/solenoid-valve/*  /pneumatic/  301
+/product-category/vacuum-pad/*      /pneumatic/  301
+/product-category/nipple/*          /pneumatic/  301
+/product-category/linear/*          /pneumatic/  301
 /shop/*                        /            301
 
 # ---------------------------------------------------------------------------

@@ -17,7 +17,7 @@ const lastmodByUrl = new Map(
 lastmodByUrl.set(`${site}/industrial-products/`, '2026-08-23');
 // engineer-unit-converter is authored directly as a route file rather than
 // migrated WordPress HTML, so its date lives here for the same reason.
-lastmodByUrl.set(`${site}/engineer-unit-converter/`, '2026-08-23');
+lastmodByUrl.set(`${site}/engineer-unit-converter/`, '2026-09-28');
 
 export default defineConfig({
   site,

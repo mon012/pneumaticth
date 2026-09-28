@@ -3,9 +3,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import footerHtml from '../data/footer.html?raw';
 import { breadcrumbTrail, breadcrumbHtml } from '../lib/content.js';
 
-const title = 'แปลงหน่วยวิศวกรรม ความดัน แรง อัตราการไหล | นิวเมติก ดอทคอม';
+// Written for the queries this page actually earns impressions on in Search
+// Console (MPa → bar, N → kg, L/s and m³/h → CFM), so the snippet answers
+// them by name instead of listing unit families.
+const title = 'แปลงหน่วย MPa เป็น bar, N เป็น kg, L/s เป็น CFM | ตารางแปลงหน่วยวิศวกรรม';
 const description =
-  'เครื่องมือแปลงหน่วยวิศวกรรมสำหรับงานโรงงาน ทั้งความดัน (bar, psi, kgf/cm²) แรง (N, kgf, lbf) อัตราการไหล กำลัง อุณหภูมิ ความยาว และแรงบิด พร้อมตารางเทียบหน่วยที่ใช้บ่อย';
+  '1 MPa = 10 bar, 1 kgf = 9.80665 N, 1 L/s = 2.119 CFM — แปลงหน่วยความดัน แรง อัตราการไหล กำลัง แรงบิด และอุณหภูมิได้ทันที พร้อมตารางค่าที่ใช้บ่อยในงานนิวเมติกและลมอัด';
 
 /**
  * Unit data — the single source for BOTH the static reference tables rendered
@@ -143,8 +146,69 @@ const TEMPERATURE_ROWS = [-40, 0, 20, 40, 100].map((c) => ({
   k: fmt(c + 273.15),
 }));
 
+/**
+ * Worked answers for the exact conversions people search for. Computed from
+ * CATEGORIES rather than typed in, so a quick answer can never drift from the
+ * converter that sits above it.
+ */
+const unitIn = (categoryId, sym) => {
+  const unit = CATEGORIES.find((c) => c.id === categoryId).units.find((u) => u.sym === sym);
+  if (!unit) throw new Error(`[converter] unknown unit ${categoryId}/${sym}`);
+  return unit;
+};
+const convertFixed = (categoryId, value, from, to) =>
+  (value * unitIn(categoryId, from).factor) / unitIn(categoryId, to).factor;
+
+const QUICK_ANSWERS = [
+  { id: 'mpa-bar', title: 'MPa เป็น bar', category: 'pressure', from: 'MPa', to: 'bar', values: [0.1, 0.2, 0.5, 0.7, 1, 1.6, 10, 20] },
+  { id: 'bar-psi', title: 'bar เป็น psi', category: 'pressure', from: 'bar', to: 'psi', values: [1, 4, 6, 7, 8, 10] },
+  { id: 'n-kgf', title: 'N (นิวตัน) เป็น kg (kgf)', category: 'force', from: 'N', to: 'kgf', values: [1, 10, 100, 500, 1000] },
+  { id: 'ls-cfm', title: 'L/s เป็น CFM', category: 'flow', from: 'L/s', to: 'CFM', values: [1, 5, 10, 50, 100] },
+  { id: 'm3h-cfm', title: 'm³/h เป็น CFM', category: 'flow', from: 'm³/h', to: 'CFM', values: [1, 10, 60, 100, 500] },
+  { id: 'gpm-lmin', title: 'GPM เป็น L/min (ลิตร)', category: 'flow', from: 'GPM', to: 'L/min', values: [1, 5, 10, 50] },
+].map((q) => ({ ...q, rows: q.values.map((v) => [fmt(v), fmt(convertFixed(q.category, v, q.from, q.to))]) }));
+
+/**
+ * One list feeds both the visible FAQ and the FAQPage node BaseLayout emits,
+ * the same pairing the WordPress articles get through pages.json.
+ */
+const FAQ = [
+  {
+    q: '1 MPa เท่ากับกี่ bar',
+    a: '1 MPa = 10 bar และ 1 bar = 0.1 MPa เช่น 0.2 MPa = 2 bar, 1.6 MPa = 16 bar, 20 MPa = 200 bar สเปกอุปกรณ์นิวเมติกจากญี่ปุ่นอย่าง SMC และ CKD มักระบุความดันเป็น MPa ส่วนเกจในโรงงานไทยส่วนใหญ่อ่านเป็น bar',
+  },
+  {
+    q: 'แปลง N เป็น kg (kgf) ทำอย่างไร',
+    a: 'หารด้วย 9.80665 เช่น 100 N = 10.197 kgf และแปลงกลับด้วยการคูณ 9.80665 เช่น 10 kgf = 98.0665 N ข้อควรระวังคือ kg เป็นหน่วยมวล ส่วน kgf (กิโลกรัมแรง) เป็นหน่วยแรง การแปลงนี้ใช้ได้เมื่อพูดถึงน้ำหนักภายใต้แรงโน้มถ่วงปกติ',
+  },
+  {
+    q: 'แปลง L/s เป็น CFM ทำอย่างไร',
+    a: 'คูณด้วย 2.11888 เช่น 10 L/s = 21.19 CFM และ 1 CFM = 0.4719 L/s เครื่องอัดลมสกรูจากยุโรปมักระบุอัตราลมเป็น L/s ส่วนสเปกจากอเมริกาใช้ CFM',
+  },
+  {
+    q: 'แปลง m³/h เป็น CFM ทำอย่างไร',
+    a: 'คูณด้วย 0.5886 เช่น 100 m³/h = 58.86 CFM และ 1 CFM = 1.699 m³/h',
+  },
+  {
+    q: '1 GPM เท่ากับกี่ลิตร',
+    a: '1 GPM (แกลลอนสหรัฐต่อนาที) = 3.785 ลิตรต่อนาที ใช้บ่อยกับสเปกปั๊มไฮดรอลิคและปั๊มน้ำ',
+  },
+  {
+    q: '1 bar เท่ากับกี่ psi',
+    a: '1 bar = 14.504 psi และ 1 psi = 0.0689 bar ระบบลมอัดโรงงานทั่วไปตั้งไว้ราว 6–7 bar หรือประมาณ 87–102 psi',
+  },
+  {
+    q: 'kgf/cm² กับ bar ต่างกันอย่างไร',
+    a: '1 kgf/cm² = 0.980665 bar ต่างกันประมาณ 2% ในงานหน้างานจึงมักใช้แทนกันได้โดยประมาณ แต่ถ้าเป็นการตั้งค่าเซฟตี้วาล์วหรือคำนวณตามสเปกควรใช้ค่าจริง',
+  },
+  {
+    q: '1 atm เท่ากับกี่ mmHg',
+    a: '1 atm = 760 mmHg = 1.01325 bar = 14.696 psi',
+  },
+];
+
 const defaultCategory = CATEGORIES[0];
-const trail = breadcrumbTrail('engineer-unit-converter', title);
+const trail = breadcrumbTrail('engineer-unit-converter', 'แปลงหน่วยวิศวกรรม');
 ---
 
 <BaseLayout
@@ -153,6 +217,7 @@ const trail = breadcrumbTrail('engineer-unit-converter', title);
   canonical="/engineer-unit-converter/"
   route="engineer-unit-converter"
   footerHtml={footerHtml}
+  faq={FAQ}
 >
   <article class="converter-page">
     <Fragment set:html={breadcrumbHtml(trail)} />
@@ -218,12 +283,36 @@ const trail = breadcrumbTrail('engineer-unit-converter', title);
       </noscript>
     </section>
 
+    <section class="converter-quick" aria-labelledby="converter-quick-title">
+      <h2 id="converter-quick-title">ค่าแปลงหน่วยที่ค้นหาบ่อย</h2>
+      <p class="converter-note">
+        1 MPa = 10 bar · 1 bar = 14.504 psi · 1 kgf = 9.80665 N · 1 L/s = 2.119 CFM · 1 m³/h = 0.5886 CFM · 1 GPM = 3.785 L/min
+      </p>
+      <div class="converter-quick-grid">
+        {QUICK_ANSWERS.map((quick) => (
+          <div class="converter-quick-card" id={quick.id}>
+            <h3>แปลง {quick.title}</h3>
+            <table>
+              <thead>
+                <tr><th scope="col">{quick.from}</th><th scope="col">{quick.to}</th></tr>
+              </thead>
+              <tbody>
+                {quick.rows.map(([from, to]) => (
+                  <tr><th scope="row">{from} {quick.from}</th><td>{to} {quick.to}</td></tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ))}
+      </div>
+    </section>
+
     <section class="converter-tables" aria-labelledby="converter-tables-title">
       <h2 id="converter-tables-title">ตารางเทียบหน่วยที่ใช้บ่อย</h2>
 
       {CATEGORIES.filter((category) => !category.temperature).map((category) => (
-        <div class="converter-table-block">
-          <h3>{category.name}</h3>
+        <div class="converter-table-block" id={`table-${category.id}`}>
+          <h3>ตารางแปลงหน่วย{category.name}</h3>
           <div class="converter-table-scroll">
             <table>
               <caption class="visually-hidden">ตารางเทียบหน่วย{category.name} เทียบกับ {category.base}</caption>
@@ -281,34 +370,12 @@ const trail = breadcrumbTrail('engineer-unit-converter', title);
     <section class="converter-faq" aria-labelledby="converter-faq-title">
       <h2 id="converter-faq-title">คำถามที่พบบ่อย</h2>
 
-      <h3>แปลง kg เป็น N ทำอย่างไร</h3>
-      <p>
-        คูณด้วย 9.80665 ซึ่งเป็นค่าความเร่งโน้มถ่วงมาตรฐาน เช่น 10 kgf = 98.0665 N
-        และแปลงกลับด้วยการหารด้วย 9.80665 เช่น 100 N = 10.1972 kgf
-        ข้อควรระวังคือ kg เป็นหน่วยมวล ส่วน kgf (กิโลกรัมแรง) เป็นหน่วยแรง
-        การแปลงนี้ใช้ได้เมื่อพูดถึงน้ำหนักที่กระทำภายใต้แรงโน้มถ่วงปกติ
-      </p>
-
-      <h3>1 bar เท่ากับกี่ psi</h3>
-      <p>
-        1 bar = 14.50377 psi และ 1 psi = 0.0689476 bar
-        เกจวัดความดันลมในโรงงานไทยส่วนใหญ่อ่านเป็น bar หรือ kgf/cm²
-        ส่วนสเปกอุปกรณ์จากอเมริกามักระบุเป็น psi
-      </p>
-
-      <h3>kgf/cm² กับ bar ต่างกันอย่างไร</h3>
-      <p>
-        1 kgf/cm² = 0.980665 bar ต่างกันประมาณ 2% เท่านั้น
-        ในงานหน้างานจึงมักใช้แทนกันได้โดยประมาณ
-        แต่ถ้าเป็นการตั้งค่าเซฟตี้วาล์วหรือคำนวณตามสเปกควรใช้ค่าจริง
-      </p>
-
-      <h3>CFM กับ L/min แปลงกันอย่างไร</h3>
-      <p>
-        1 CFM = 28.3168 L/min และ 1 L/min = 0.0353147 CFM
-        ใช้บ่อยตอนเทียบสเปกเครื่องอัดลมที่ระบุเป็น CFM
-        กับความต้องการลมของอุปกรณ์ที่ระบุเป็น L/min
-      </p>
+      {FAQ.map((item) => (
+        <Fragment>
+          <h3>{item.q}</h3>
+          <p>{item.a}</p>
+        </Fragment>
+      ))}
     </section>
 
     <section class="converter-related" aria-labelledby="converter-related-title">
@@ -316,7 +383,7 @@ const trail = breadcrumbTrail('engineer-unit-converter', title);
       <ul>
         <li><a href="/air-compressor/">เครื่องอัดอากาศ หรือเครื่องอัดลม มีกี่ประเภท</a> — วิธีคำนวณอัตราการผลิตลมอัดให้พอกับโรงงาน</li>
         <li><a href="/aftercoolers-factory/">Aftercooler คืออะไร</a> — วิธีคำนวณอุณหภูมิลมขาออกหลังระบายความร้อน</li>
-        <li><a href="/pneumatic/">อุปกรณ์นิวเมติกส์</a> — กระบอกลม วาล์ว ข้อต่อลม และชุดปรับปรุงคุณภาพลม</li>
+        <li><a href="/pneumatic/">อุปกรณ์นิวเมติกส์ SMC, FESTO, Norgren</a> — กระบอกลม วาล์ว ข้อต่อลม และชุดปรับปรุงคุณภาพลม ขอราคาได้ทาง LINE</li>
         <li><a href="/hydraulic/">อุปกรณ์ไฮดรอลิค</a> — ปั๊ม วาล์ว และกระบอกไฮดรอลิค</li>
       </ul>
     </section>
@@ -356,8 +423,18 @@ const trail = breadcrumbTrail('engineer-unit-converter', title);
   .converter-summary:empty{display:none}
   .converter-noscript{margin:1.25rem 0 0;color:var(--muted)}
 
-  .converter-tables,.converter-faq,.converter-related{padding-top:clamp(2.5rem,5vw,4rem)}
-  .converter-tables h2,.converter-faq h2,.converter-related h2{margin:0 0 .5rem;color:var(--ink);font-size:clamp(1.55rem,2.6vw,2rem);line-height:1.25}
+  .converter-quick-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1rem;margin-top:1.25rem}
+  .converter-quick-card{padding:1rem 1.1rem;border:1px solid var(--line);border-radius:14px;background:#fff}
+  .converter-quick-card h3{margin:0 0 .5rem;font-size:1.1rem}
+  .converter-quick-card table{width:100%;border-collapse:collapse;font-size:1rem}
+  .converter-quick-card th,.converter-quick-card td{padding:.4rem .25rem;border-bottom:1px solid var(--line);text-align:left}
+  .converter-quick-card thead th{color:var(--muted);font-size:.9rem}
+  .converter-quick-card tbody tr:last-child th,.converter-quick-card tbody tr:last-child td{border-bottom:0}
+  .converter-quick-card tbody th{font-weight:400}
+  .converter-quick-card td{font-weight:700}
+
+  .converter-quick,.converter-tables,.converter-faq,.converter-related{padding-top:clamp(2.5rem,5vw,4rem)}
+  .converter-quick h2,.converter-tables h2,.converter-faq h2,.converter-related h2{margin:0 0 .5rem;color:var(--ink);font-size:clamp(1.55rem,2.6vw,2rem);line-height:1.25}
   .converter-table-block{margin-top:clamp(1.75rem,3vw,2.5rem)}
   .converter-table-block h3{margin:0 0 .65rem;font-size:1.25rem}
 
