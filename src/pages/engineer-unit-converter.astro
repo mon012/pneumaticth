@@ -396,14 +396,18 @@ const trail = breadcrumbTrail('engineer-unit-converter', 'แปลงหน่�
       </div>
     </section>
 
+    <figure class="converter-figure">
+      <img src="/images/converter/engineer-cad-drawing.webp" width="1000" height="564" loading="lazy" decoding="async" alt="วิศวกรเปิดแบบงานบนโปรแกรม CAD ที่ระบุขนาดเป็นหน่วยมิลลิเมตร" />
+    </figure>
+
     <section class="converter-faq" aria-labelledby="converter-faq-title">
       <h2 id="converter-faq-title">คำถามที่พบบ่อย</h2>
 
       {FAQ.map((item) => (
-        <Fragment>
-          <h3>{item.q}</h3>
+        <details class="faq-item">
+          <summary><h3>{item.q}</h3></summary>
           <p>{item.a}</p>
-        </Fragment>
+        </details>
       ))}
     </section>
 
@@ -475,8 +479,18 @@ const trail = breadcrumbTrail('engineer-unit-converter', 'แปลงหน่�
   .converter-tables tbody th{font-weight:700}
   .converter-note{margin:.85rem 0 0;color:var(--muted);font-size:1rem;line-height:1.75}
 
-  .converter-faq h3{margin:clamp(1.5rem,3vw,2rem) 0 .5rem;font-size:1.25rem}
-  .converter-faq p{margin:0;max-width:72ch;line-height:1.85}
+  .converter-figure{margin:clamp(2.5rem,5vw,4rem) 0 0}
+  .converter-figure img{display:block;width:100%;height:auto;border-radius:var(--radius)}
+  .converter-faq h2{margin-bottom:1rem}
+  .faq-item{border-bottom:1px solid var(--line)}
+  .faq-item:first-of-type{border-top:1px solid var(--line)}
+  .faq-item summary{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 0;cursor:pointer;list-style:none}
+  .faq-item summary::-webkit-details-marker{display:none}
+  .faq-item summary::after{content:"+";flex:none;font-size:1.5rem;line-height:1;color:var(--muted)}
+  .faq-item[open] summary::after{content:"−"}
+  .faq-item summary:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+  .converter-faq h3{margin:0;font-size:1.15rem;line-height:1.5}
+  .converter-faq .faq-item p{margin:0 0 1.25rem;max-width:72ch;line-height:1.85}
 
   .converter-related ul{margin:1rem 0 0;padding-left:1.5rem}
   .converter-related li{margin:.5rem 0;padding-left:.3rem;line-height:1.75}
