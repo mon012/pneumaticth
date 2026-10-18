@@ -13,5 +13,13 @@
 /wp-content/uploads/*
   Cache-Control: public, max-age=2592000
 
+# A full script CSP is left out: GTM, Google Ads and the Deftform embed load
+# third-party scripts that change without notice, so an allowlist would break
+# tracking or the contact form silently. frame-ancestors only stops clickjacking.
 /*
   X-Content-Type-Options: nosniff
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Frame-Options: SAMEORIGIN
+  Content-Security-Policy: frame-ancestors 'self'; upgrade-insecure-requests
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
