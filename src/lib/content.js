@@ -255,11 +255,11 @@ export function faqHtml(faq) {
   const items = faq
     .map(
       (item) =>
-        `<h3 class="wp-block-heading">${escape(item.q)}</h3>` +
-        `<p class="wp-block-paragraph">${escape(item.a)}</p>`,
+        `<details class="faq-item"><summary><h3 class="wp-block-heading">${escape(item.q)}</h3></summary>` +
+        `<p class="wp-block-paragraph">${escape(item.a)}</p></details>`,
     )
     .join('');
-  return `<h2 class="wp-block-heading">คำถามที่พบบ่อย</h2>${items}`;
+  return `<h2 class="wp-block-heading" id="faq">คำถามที่พบบ่อย</h2><div class="article-faq">${items}</div>`;
 }
 
 /**

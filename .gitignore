@@ -4,3 +4,5 @@ dist/
 .DS_Store
 _to_delete/
 .claude/
+scripts/figures/*/shots/
+scripts/figures/*/*.html
