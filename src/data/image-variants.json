@@ -17,6 +17,66 @@
       }
     ]
   },
+  "/images/articles/pneumatic-cylinder-card.webp": {
+    "width": 750,
+    "height": 500,
+    "variants": [
+      {
+        "url": "/images/articles/pneumatic-cylinder-card-320w.webp",
+        "width": 320
+      },
+      {
+        "url": "/images/articles/pneumatic-cylinder-card-480w.webp",
+        "width": 480
+      },
+      {
+        "url": "/images/articles/pneumatic-cylinder-card-640w.webp",
+        "width": 640
+      },
+      {
+        "url": "/images/articles/pneumatic-cylinder-card.webp",
+        "width": 750
+      }
+    ]
+  },
+  "/images/articles/pneumatic-cylinder.webp": {
+    "width": 1600,
+    "height": 900,
+    "variants": [
+      {
+        "url": "/images/articles/pneumatic-cylinder-320w.webp",
+        "width": 320
+      },
+      {
+        "url": "/images/articles/pneumatic-cylinder-480w.webp",
+        "width": 480
+      },
+      {
+        "url": "/images/articles/pneumatic-cylinder-640w.webp",
+        "width": 640
+      },
+      {
+        "url": "/images/articles/pneumatic-cylinder-720w.webp",
+        "width": 720
+      },
+      {
+        "url": "/images/articles/pneumatic-cylinder-800w.webp",
+        "width": 800
+      },
+      {
+        "url": "/images/articles/pneumatic-cylinder-1024w.webp",
+        "width": 1024
+      },
+      {
+        "url": "/images/articles/pneumatic-cylinder-1280w.webp",
+        "width": 1280
+      },
+      {
+        "url": "/images/articles/pneumatic-cylinder.webp",
+        "width": 1600
+      }
+    ]
+  },
   "/images/articles/pneumatic-system-card.webp": {
     "width": 750,
     "height": 500,

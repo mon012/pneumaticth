@@ -179,6 +179,7 @@ const BLOG_ARTICLES = new Set([
   'air-compressor',
   'hydraulic-cylinder-overhaul',
   'plc-type',
+  'pneumatic-cylinder',
   'pneumatic-system',
   'purchasing-department-tips',
   'solenoid-valve',
