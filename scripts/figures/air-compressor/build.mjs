@@ -29,13 +29,13 @@ const HEAD_Z = CYL_Z[1];
 const TANK_P = { x: -56, y: -14, w: 30, d: 28, r: 4 };
 
 // ── screw side (right) ──
-const SX = [26, 104]; // rotor span along x
+const SX = [24, 70]; // rotor span along x
 const AXZ = 16;
 const RM = 7.4; // male rotor
 const RF = 6.2; // female rotor
 const YM = -6.6, YF = 7.2;
 const HOUSING = { x: SX[0] - 8, y: -18, w: SX[1] - SX[0] + 16, d: 34, r: 3 };
-const TANK_S = { x: 118, y: -14, w: 26, d: 28, r: 4 };
+const TANK_S = { x: 98, y: -14, w: 28, d: 28, r: 4 };
 
 const P = k.fitProjection([...k.boxCorners(PLATE, -PLATE_H - FOOT_H, 0), [PX, 0, HEAD_Z + 14]], WIDTH, HEIGHT, { pad: 22, azimuth: 56, elevation: 30 });
 
