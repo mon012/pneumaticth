@@ -181,6 +181,7 @@ const BLOG_ARTICLES = new Set([
   'plc-type',
   'pneumatic-cylinder',
   'pneumatic-system',
+  'pneumatic-valves',
   'pressure-switch',
   'purchasing-department-tips',
   'solenoid-valve',
