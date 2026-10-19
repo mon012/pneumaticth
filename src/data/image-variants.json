@@ -317,6 +317,66 @@
       }
     ]
   },
+  "/images/articles/proximity-sensor-card.webp": {
+    "width": 750,
+    "height": 500,
+    "variants": [
+      {
+        "url": "/images/articles/proximity-sensor-card-320w.webp",
+        "width": 320
+      },
+      {
+        "url": "/images/articles/proximity-sensor-card-480w.webp",
+        "width": 480
+      },
+      {
+        "url": "/images/articles/proximity-sensor-card-640w.webp",
+        "width": 640
+      },
+      {
+        "url": "/images/articles/proximity-sensor-card.webp",
+        "width": 750
+      }
+    ]
+  },
+  "/images/articles/proximity-sensor.webp": {
+    "width": 1600,
+    "height": 900,
+    "variants": [
+      {
+        "url": "/images/articles/proximity-sensor-320w.webp",
+        "width": 320
+      },
+      {
+        "url": "/images/articles/proximity-sensor-480w.webp",
+        "width": 480
+      },
+      {
+        "url": "/images/articles/proximity-sensor-640w.webp",
+        "width": 640
+      },
+      {
+        "url": "/images/articles/proximity-sensor-720w.webp",
+        "width": 720
+      },
+      {
+        "url": "/images/articles/proximity-sensor-800w.webp",
+        "width": 800
+      },
+      {
+        "url": "/images/articles/proximity-sensor-1024w.webp",
+        "width": 1024
+      },
+      {
+        "url": "/images/articles/proximity-sensor-1280w.webp",
+        "width": 1280
+      },
+      {
+        "url": "/images/articles/proximity-sensor.webp",
+        "width": 1600
+      }
+    ]
+  },
   "/images/articles/solenoid-valve-card.webp": {
     "width": 750,
     "height": 500,

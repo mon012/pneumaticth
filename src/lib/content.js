@@ -184,6 +184,7 @@ const BLOG_ARTICLES = new Set([
   'pneumatic-system',
   'pneumatic-valves',
   'pressure-switch',
+  'proximity-sensor',
   'purchasing-department-tips',
   'solenoid-valve',
 ]);
