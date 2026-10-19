@@ -179,7 +179,9 @@ const BLOG_ARTICLES = new Set([
   'air-compressor',
   'hydraulic-cylinder-overhaul',
   'plc-type',
+  'pneumatic-system',
   'purchasing-department-tips',
+  'solenoid-valve',
 ]);
 
 /** Routes with no breadcrumb: the home page is the root, 404 is not a place. */

@@ -17,6 +17,126 @@
       }
     ]
   },
+  "/images/articles/pneumatic-system-card.webp": {
+    "width": 750,
+    "height": 500,
+    "variants": [
+      {
+        "url": "/images/articles/pneumatic-system-card-320w.webp",
+        "width": 320
+      },
+      {
+        "url": "/images/articles/pneumatic-system-card-480w.webp",
+        "width": 480
+      },
+      {
+        "url": "/images/articles/pneumatic-system-card-640w.webp",
+        "width": 640
+      },
+      {
+        "url": "/images/articles/pneumatic-system-card.webp",
+        "width": 750
+      }
+    ]
+  },
+  "/images/articles/pneumatic-system.webp": {
+    "width": 1600,
+    "height": 900,
+    "variants": [
+      {
+        "url": "/images/articles/pneumatic-system-320w.webp",
+        "width": 320
+      },
+      {
+        "url": "/images/articles/pneumatic-system-480w.webp",
+        "width": 480
+      },
+      {
+        "url": "/images/articles/pneumatic-system-640w.webp",
+        "width": 640
+      },
+      {
+        "url": "/images/articles/pneumatic-system-720w.webp",
+        "width": 720
+      },
+      {
+        "url": "/images/articles/pneumatic-system-800w.webp",
+        "width": 800
+      },
+      {
+        "url": "/images/articles/pneumatic-system-1024w.webp",
+        "width": 1024
+      },
+      {
+        "url": "/images/articles/pneumatic-system-1280w.webp",
+        "width": 1280
+      },
+      {
+        "url": "/images/articles/pneumatic-system.webp",
+        "width": 1600
+      }
+    ]
+  },
+  "/images/articles/solenoid-valve-card.webp": {
+    "width": 750,
+    "height": 500,
+    "variants": [
+      {
+        "url": "/images/articles/solenoid-valve-card-320w.webp",
+        "width": 320
+      },
+      {
+        "url": "/images/articles/solenoid-valve-card-480w.webp",
+        "width": 480
+      },
+      {
+        "url": "/images/articles/solenoid-valve-card-640w.webp",
+        "width": 640
+      },
+      {
+        "url": "/images/articles/solenoid-valve-card.webp",
+        "width": 750
+      }
+    ]
+  },
+  "/images/articles/solenoid-valve.webp": {
+    "width": 1600,
+    "height": 900,
+    "variants": [
+      {
+        "url": "/images/articles/solenoid-valve-320w.webp",
+        "width": 320
+      },
+      {
+        "url": "/images/articles/solenoid-valve-480w.webp",
+        "width": 480
+      },
+      {
+        "url": "/images/articles/solenoid-valve-640w.webp",
+        "width": 640
+      },
+      {
+        "url": "/images/articles/solenoid-valve-720w.webp",
+        "width": 720
+      },
+      {
+        "url": "/images/articles/solenoid-valve-800w.webp",
+        "width": 800
+      },
+      {
+        "url": "/images/articles/solenoid-valve-1024w.webp",
+        "width": 1024
+      },
+      {
+        "url": "/images/articles/solenoid-valve-1280w.webp",
+        "width": 1280
+      },
+      {
+        "url": "/images/articles/solenoid-valve.webp",
+        "width": 1600
+      }
+    ]
+  },
   "/wp-content/uploads/2024/03/IMG_0856-1.webp": {
     "width": 1477,
     "height": 986,
