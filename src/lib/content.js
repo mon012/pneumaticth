@@ -186,6 +186,7 @@ const BLOG_ARTICLES = new Set([
   'pressure-switch',
   'proximity-sensor',
   'purchasing-department-tips',
+  'relay',
   'solenoid-valve',
 ]);
 
