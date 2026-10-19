@@ -460,8 +460,8 @@
     ]
   },
   "/images/articles/servo-vs-stepper-motor.webp": {
-    "width": 1600,
-    "height": 900,
+    "width": 1200,
+    "height": 675,
     "variants": [
       {
         "url": "/images/articles/servo-vs-stepper-motor-320w.webp",
@@ -488,12 +488,8 @@
         "width": 1024
       },
       {
-        "url": "/images/articles/servo-vs-stepper-motor-1280w.webp",
-        "width": 1280
-      },
-      {
         "url": "/images/articles/servo-vs-stepper-motor.webp",
-        "width": 1600
+        "width": 1200
       }
     ]
   },
