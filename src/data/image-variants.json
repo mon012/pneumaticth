@@ -17,6 +17,66 @@
       }
     ]
   },
+  "/images/articles/air-preparation-card.webp": {
+    "width": 750,
+    "height": 500,
+    "variants": [
+      {
+        "url": "/images/articles/air-preparation-card-320w.webp",
+        "width": 320
+      },
+      {
+        "url": "/images/articles/air-preparation-card-480w.webp",
+        "width": 480
+      },
+      {
+        "url": "/images/articles/air-preparation-card-640w.webp",
+        "width": 640
+      },
+      {
+        "url": "/images/articles/air-preparation-card.webp",
+        "width": 750
+      }
+    ]
+  },
+  "/images/articles/air-preparation.webp": {
+    "width": 1600,
+    "height": 900,
+    "variants": [
+      {
+        "url": "/images/articles/air-preparation-320w.webp",
+        "width": 320
+      },
+      {
+        "url": "/images/articles/air-preparation-480w.webp",
+        "width": 480
+      },
+      {
+        "url": "/images/articles/air-preparation-640w.webp",
+        "width": 640
+      },
+      {
+        "url": "/images/articles/air-preparation-720w.webp",
+        "width": 720
+      },
+      {
+        "url": "/images/articles/air-preparation-800w.webp",
+        "width": 800
+      },
+      {
+        "url": "/images/articles/air-preparation-1024w.webp",
+        "width": 1024
+      },
+      {
+        "url": "/images/articles/air-preparation-1280w.webp",
+        "width": 1280
+      },
+      {
+        "url": "/images/articles/air-preparation.webp",
+        "width": 1600
+      }
+    ]
+  },
   "/images/articles/pneumatic-cylinder-card.webp": {
     "width": 750,
     "height": 500,

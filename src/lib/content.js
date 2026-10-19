@@ -177,6 +177,7 @@ export function responsiveImages(html, manifest) {
 const BLOG_ARTICLES = new Set([
   'aftercoolers-factory',
   'air-compressor',
+  'air-preparation',
   'hydraulic-cylinder-overhaul',
   'plc-type',
   'pneumatic-cylinder',
