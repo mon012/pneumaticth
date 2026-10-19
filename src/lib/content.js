@@ -187,6 +187,7 @@ const BLOG_ARTICLES = new Set([
   'proximity-sensor',
   'purchasing-department-tips',
   'relay',
+  'servo-vs-stepper-motor',
   'solenoid-valve',
 ]);
 

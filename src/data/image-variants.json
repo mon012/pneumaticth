@@ -437,6 +437,66 @@
       }
     ]
   },
+  "/images/articles/servo-vs-stepper-motor-card.webp": {
+    "width": 750,
+    "height": 500,
+    "variants": [
+      {
+        "url": "/images/articles/servo-vs-stepper-motor-card-320w.webp",
+        "width": 320
+      },
+      {
+        "url": "/images/articles/servo-vs-stepper-motor-card-480w.webp",
+        "width": 480
+      },
+      {
+        "url": "/images/articles/servo-vs-stepper-motor-card-640w.webp",
+        "width": 640
+      },
+      {
+        "url": "/images/articles/servo-vs-stepper-motor-card.webp",
+        "width": 750
+      }
+    ]
+  },
+  "/images/articles/servo-vs-stepper-motor.webp": {
+    "width": 1600,
+    "height": 900,
+    "variants": [
+      {
+        "url": "/images/articles/servo-vs-stepper-motor-320w.webp",
+        "width": 320
+      },
+      {
+        "url": "/images/articles/servo-vs-stepper-motor-480w.webp",
+        "width": 480
+      },
+      {
+        "url": "/images/articles/servo-vs-stepper-motor-640w.webp",
+        "width": 640
+      },
+      {
+        "url": "/images/articles/servo-vs-stepper-motor-720w.webp",
+        "width": 720
+      },
+      {
+        "url": "/images/articles/servo-vs-stepper-motor-800w.webp",
+        "width": 800
+      },
+      {
+        "url": "/images/articles/servo-vs-stepper-motor-1024w.webp",
+        "width": 1024
+      },
+      {
+        "url": "/images/articles/servo-vs-stepper-motor-1280w.webp",
+        "width": 1280
+      },
+      {
+        "url": "/images/articles/servo-vs-stepper-motor.webp",
+        "width": 1600
+      }
+    ]
+  },
   "/images/articles/solenoid-valve-card.webp": {
     "width": 750,
     "height": 500,
